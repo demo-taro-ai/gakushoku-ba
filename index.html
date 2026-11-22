@@ -4,40 +4,48 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>学食BAシミュレーション</title>
+<title>学食BAシミュレーション（v0.6 試作）</title>
 <style>
 :root{
   --bg:#f6f5f1; --surface:#ffffff; --surface2:#efede6; --text:#1f2328; --muted:#5f6670;
   --line:#dcd9cf; --accent:#1f6f5c; --accent-weak:#e1efe9; --accent-text:#ffffff;
+  --ctr:#2b5fa8; --ctr-weak:#e3ecf8; --ctr-text:#ffffff;
   --warn:#b4530f; --warn-weak:#fbeadc; --bad:#b42318; --bad-weak:#fde4e1; --good:#1f7a3a; --good-weak:#e2f3e6;
-  --card:#fff8e1; --card-line:#e9d9a0;
+  --card:#fff8e1; --card-line:#e9d9a0; --req:#e8eef8; --req-line:#a9bde0;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#16181b; --surface:#1f2226; --surface2:#2a2e33; --text:#e8e6e1; --muted:#a3a8ae;
     --line:#3a3f45; --accent:#5cc2a4; --accent-weak:#1f3a33; --accent-text:#0f1a17;
+    --ctr:#7fb0ff; --ctr-weak:#1d2a40; --ctr-text:#0f1a2b;
     --warn:#f0a35e; --warn-weak:#3d2a1a; --bad:#f28b82; --bad-weak:#3e1f1d; --good:#7fd197; --good-weak:#1d3324;
-    --card:#2f2a1a; --card-line:#5a4d25;
+    --card:#2f2a1a; --card-line:#5a4d25; --req:#1d2638; --req-line:#3d5280;
   }
 }
 :root[data-theme="dark"]{
   --bg:#16181b; --surface:#1f2226; --surface2:#2a2e33; --text:#e8e6e1; --muted:#a3a8ae;
   --line:#3a3f45; --accent:#5cc2a4; --accent-weak:#1f3a33; --accent-text:#0f1a17;
+  --ctr:#7fb0ff; --ctr-weak:#1d2a40; --ctr-text:#0f1a2b;
   --warn:#f0a35e; --warn-weak:#3d2a1a; --bad:#f28b82; --bad-weak:#3e1f1d; --good:#7fd197; --good-weak:#1d3324;
-  --card:#2f2a1a; --card-line:#5a4d25;
+  --card:#2f2a1a; --card-line:#5a4d25; --req:#1d2638; --req-line:#3d5280;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);
   font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Meiryo",sans-serif;
   line-height:1.7;font-size:16px}
-.wrap{max-width:680px;margin:0 auto;padding:0 16px 120px}
-header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 16px 8px}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px 140px}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px 6px}
 .top-inner{max-width:680px;margin:0 auto}
-.top-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
-.baccm{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.baccm span{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
-.baccm span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.top-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2px 8px;font-size:12px;color:var(--muted)}
+.bamap{margin-top:4px;font-size:11px}
+.bamap .row{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:2px}
+.bamap .row b{font-size:10px;color:var(--muted);width:100%;font-weight:600}
+.bamap span{padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.bamap span.ctr{background:var(--ctr);border-color:var(--ctr);color:var(--ctr-text);font-weight:700}
+.bamap span.par{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.bamap span.off{opacity:.35}
+.bamap i{font-style:normal;color:var(--muted)}
 .progress{height:4px;background:var(--surface2);border-radius:4px;margin-top:6px;overflow:hidden}
 .progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
 h1{font-size:22px;line-height:1.4;margin:24px 0 8px}
@@ -45,19 +53,20 @@ h2{font-size:19px;line-height:1.45;margin:22px 0 8px}
 h3{font-size:16px;margin:18px 0 6px}
 p{margin:8px 0}
 .muted{color:var(--muted);font-size:14px}
-.ka{background:var(--accent-weak);border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;margin:14px 0;font-size:14px}
-.ka b{display:block;font-size:13px;color:var(--accent)}
+.ka{background:var(--ctr-weak);border-left:4px solid var(--ctr);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:14px}
+.ka b{display:block;font-size:13px;color:var(--ctr)}
 .say{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
 .say .who{font-size:12px;color:var(--muted)}
-.opts{display:grid;gap:10px;margin:14px 0}
-.opt{display:block;width:100%;text-align:left;background:var(--surface);color:var(--text);border:2px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;cursor:pointer}
+.qh{font-weight:700;margin:22px 0 6px;font-size:16px}
+.qh .qn{display:inline-block;background:var(--ctr);color:var(--ctr-text);border-radius:6px;font-size:12px;padding:0 8px;margin-right:6px}
+.opts{display:grid;gap:8px;margin:8px 0}
+.opt{display:block;width:100%;text-align:left;background:var(--surface);color:var(--text);border:2px solid var(--line);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer}
 .opt:hover{border-color:var(--accent)}
 .opt.sel{border-color:var(--accent);background:var(--accent-weak)}
 .opt:disabled{cursor:default}
 .opt:disabled:not(.sel){opacity:.55}
 .opt .t{font-weight:700;display:block}
 .opt .d{font-size:13px;color:var(--muted);display:block;margin-top:2px}
-.opt .pc{display:grid;grid-template-columns:auto 1fr;gap:0 6px;font-size:12px;margin-top:6px;color:var(--muted)}
 .btn{display:inline-block;background:var(--accent);color:var(--accent-text);border:0;border-radius:10px;padding:12px 20px;font:inherit;font-weight:700;cursor:pointer;min-width:140px}
 .btn:disabled{opacity:.4;cursor:default}
 .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
@@ -67,21 +76,30 @@ p{margin:8px 0}
 .fb.warn{background:var(--warn-weak);border-color:transparent}
 .fb.bad{background:var(--bad-weak);border-color:transparent}
 .fb h3{margin-top:0}
+.fb ul{margin:4px 0;padding-left:20px}
 .newcard{background:var(--card);border:1px solid var(--card-line);border-radius:10px;padding:8px 12px;margin:8px 0;font-size:14px}
 .newcard b{font-size:12px;display:block}
+.newcard .meta{font-size:11px;color:var(--muted)}
+.reqcard{background:var(--req);border:1px solid var(--req-line);border-radius:10px;padding:8px 12px;margin:8px 0;font-size:14px}
+.reqcard b{font-size:12px;display:block}
+.reqcard .meta{font-size:11px;color:var(--muted)}
 .drawer{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.08)}
-.drawer-inner{max-width:680px;margin:0 auto;padding:8px 16px}
-.drawer button.toggle{width:100%;background:none;border:0;color:var(--text);font:inherit;font-weight:700;text-align:left;padding:6px 0;cursor:pointer}
-.drawer .list{max-height:45vh;overflow:auto;padding-bottom:8px}
-.count{display:inline-block;background:var(--warn);color:#fff;border-radius:999px;font-size:12px;padding:0 8px;margin-left:6px}
-.quiz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
-.quiz .q{font-weight:700;margin-bottom:8px}
+.drawer-inner{max-width:680px;margin:0 auto;padding:6px 16px}
+.drawer button.toggle{width:100%;background:none;border:0;color:var(--text);font:inherit;font-weight:700;text-align:left;padding:4px 0;cursor:pointer}
+.drawer .list{max-height:50vh;overflow:auto;padding-bottom:8px}
+.count{display:inline-block;color:#fff;border-radius:999px;font-size:12px;padding:0 8px;margin-left:6px}
+.count.i{background:var(--warn)} .count.r{background:var(--ctr)}
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+.quiz .q{font-weight:700;margin-bottom:2px}
+.quiz .src{font-size:12px;color:var(--muted);margin-bottom:8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;text-align:left}
 .chip.sel{border-color:var(--accent);background:var(--accent-weak)}
 .chip.right{border-color:var(--good);background:var(--good-weak)}
 .chip.wrong{border-color:var(--bad);background:var(--bad-weak)}
 .chip:disabled{cursor:default}
+.chip:disabled:not(.sel):not(.right):not(.wrong){opacity:.5}
+.chip.sq{border-radius:10px}
 .ans{font-size:13px;margin-top:6px}
 .meter{margin:10px 0}
 .meter .lab{display:flex;justify-content:space-between;font-size:14px}
@@ -93,126 +111,277 @@ p{margin:8px 0}
 table.log{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
 table.log th,table.log td{border-bottom:1px solid var(--line);padding:8px 6px;vertical-align:top;text-align:left}
 table.log th{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
+table.grid{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+table.grid th,table.grid td{border:1px solid var(--line);padding:4px 5px;text-align:center}
+table.grid th:first-child,table.grid td:first-child{text-align:left}
+table.grid th{background:var(--surface2);font-weight:600}
+.ok{color:var(--good);font-weight:700} .mid{color:var(--warn);font-weight:700} .ng{color:var(--bad);font-weight:700}
 .tech{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:var(--surface);font-size:14px}
 .tech.used{border-color:var(--accent);background:var(--accent-weak)}
 .tech .nm{font-weight:700}
 .badge{font-size:11px;border-radius:999px;padding:1px 8px;margin-left:6px;background:var(--accent);color:var(--accent-text)}
 .note{font-size:12px;color:var(--muted)}
 .hide{display:none}
+.who{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;margin:8px 0}
+.who .nm{font-weight:700}
+.who .ds{font-size:12px;color:var(--muted)}
+.who .ms{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.mchip{border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer;text-align:left;line-height:1.35}
+.mchip small{display:block;font-size:11px;color:var(--muted)}
+.mchip.sel{border-color:var(--accent);background:var(--accent-weak)}
+.mchip.done{border-style:dashed;opacity:.6}
+.mchip:disabled{cursor:default}
+.mchip.no{opacity:.45}
+.who .why{font-size:11px;color:var(--muted);margin-top:4px}
+textarea.pt{width:100%;min-height:96px;border:2px solid var(--line);border-radius:12px;padding:10px;font:inherit;background:var(--surface);color:var(--text);resize:vertical}
+.cost{display:flex;justify-content:space-between;font-size:14px;margin:6px 0}
+.syn{font-size:13px;margin:4px 0}
+.syn.warn{color:var(--warn)}
+.syn.pre{color:var(--muted)}
+.mark{font-size:11px;border-radius:999px;padding:0 8px;margin-left:6px;border:1px solid var(--line);font-weight:400}
+.mark.tidy{background:var(--warn-weak);color:var(--warn);border-color:transparent}
+.mark.done{background:var(--good-weak);color:var(--good);border-color:transparent}
+.kv td:first-child{white-space:nowrap;color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-inner">
-  <div class="top-row"><span id="stageLabel"></span><span>BACCM（6つのコア概念）</span></div>
-  <div class="baccm" id="baccm"></div>
+  <div class="top-row"><span id="stageLabel"></span><span>BAの全体図（青＝中心／緑＝並行／薄い＝まだ紹介していない）</span></div>
+  <div class="bamap" id="bamap"></div>
   <div class="progress"><i id="prog"></i></div>
 </div></header>
 <main class="wrap" id="app"></main>
 <div class="drawer hide" id="drawer"><div class="drawer-inner">
-  <button class="toggle" id="drawerToggle">発見カード<span class="count" id="cardCount">0</span> <span class="muted" id="drawerHint">（タップで開く）</span></button>
+  <button class="toggle" id="drawerToggle">手持ちのカード <span class="count i" id="cntI">0</span><span class="count r" id="cntR">0</span> <span class="muted" id="drawerHint">（タップで開く）</span></button>
   <div class="list hide" id="cardList"></div>
 </div></div>
 
 <script>
 "use strict";
 // ============ データ ============
-// 数値・発言は「調査まとめ_日本の大学の学食.md」の実態をもとにした架空の設定
-const BACCM = ["ニーズ","コンテキスト","ステークホルダー","ソリューション","変化","価値"];
 const BUDGET = 150; // 学生課の初年度予算（万円）
 
 const KA = {
-  s1:{name:"戦略分析",text:"今の状態（現状）と、目指したい状態（将来）を比べ、その差から「本当に解くべき問題」を決めます。依頼主が口にした解決策をそのまま受け取らないことが大切です。"},
-  s2:{name:"ビジネスアナリシスの計画とモニタリング",text:"誰が関係し、誰に何を聞くのかを最初に計画します。時間には限りがあるので、関係者を洗い出したうえで優先順位をつけます。"},
-  s3:{name:"引き出しとコラボレーション",text:"関係者から情報を引き出す方法（技法）はたくさんあります。聞く・数える・見る・一緒に考える・試作を見せる・他の例を調べる。方法によって手に入る情報が変わります。"},
-  s4:{name:"要求分析とデザイン定義",text:"集めた声を整理し、種類に分け、優先順位をつけます。そのうえで、要求を満たす解決策の案を選びます。"},
-  s5:{name:"要求ライフサイクル管理",text:"要求は途中で変わります。どの要求がどの目的につながっているか（トレーサビリティ）を把握し、変更を受けるか・削るかを判断します。"},
-  s6:{name:"ソリューション評価",text:"解決策が本当に価値を生んだかを測ります。効果が出ない場合は、その原因を探して次の改善につなげます。"}
+  sa:{short:"戦略分析",name:"戦略分析",text:"今の状態（現状）と、目指したい状態（将来）を比べ、その差から「本当に解くべき問題」を決めます。依頼主が口にした解決策をそのまま受け取らないことが大切です。"},
+  ra:{short:"要求分析とデザイン定義",name:"要求分析とデザイン定義",text:"集めた情報を整理して要求として書き、種類に分け、要求を満たす解決策の案（デザイン）を決めます。"},
+  se:{short:"ソリューション評価",name:"ソリューション評価",text:"解決策が本当に価値を生んだかを測ります。効果が出ない場合は、その原因を探して次の改善につなげます。結果によっては、最初の段階に戻ります。"},
+  ba:{short:"計画とモニタリング",name:"ビジネスアナリシスの計画とモニタリング",text:"誰に・どの方法で・何を聞くかを計画し、進み具合を見て計画を直します。時間は限られているので、結果を見て見直すことも含まれます。"},
+  el:{short:"引き出しとコラボレーション",name:"引き出しとコラボレーション",text:"関係者から情報を集め（引き出し）、内容を確認します。相手と方法の組み合わせによって、手に入る情報の量と深さが変わります。"},
+  rl:{short:"要求ライフサイクル管理",name:"要求ライフサイクル管理",text:"要求に優先順位をつけ、出所（どの情報から来たか）をたどれる状態にし、変更が起きたら影響を確認して承認します。これはどの段階でも行います。"}
 };
-
-const CARDS = {
-  data:{from:"学生生活アンケート・売上データ",text:"食堂の満足度は学内施設で最下位。来店の7割が12:20〜12:45に集中し、ピーク時の平均待ち時間は14分。"},
-  student:{from:"学生",text:"昼休みは45分。並んで、食べて、次の教室へ移動なんて無理。結局コンビニのパンで済ませている。"},
-  student_deep:{from:"学生・インタビュー",text:"並ぶのもつらいけど、一番困るのは席が空いていないこと。空いている時間がわかれば、ずらしてもいい。"},
-  staff:{from:"調理・レジのパート",text:"アプリのバーコード決済は、昔のICカードより会計に時間がかかる。昼は返却口にも列ができる。"},
-  staff_deep:{from:"パート・インタビュー",text:"混むのは30分だけ。そのために人を増やすと前後は手が余る。事前注文が同じ時刻に大量に来たら、フライヤーが足りない。"},
-  manager:{from:"生協の店長",text:"生協は大学とは別の組織で、独立採算。システムの月額や決済手数料（売上の約3%）を払う余裕はない。"},
-  manager_deep:{from:"店長・インタビュー",text:"物価高と人件費で、食堂はぎりぎりの黒字。本音は、ピーク以外の時間にも来てほしい。"},
-  kyomu:{from:"教務課",text:"昼休みを延ばすには時間割の全面見直しが必要。教授会の承認がいるので、早くて再来年度から。"},
-  kyomu_deep:{from:"教務課・インタビュー",text:"近くの大学でも、100分授業で昼休みが40分に縮み、学生の不満から90分授業に戻した例がある。教員の間にも見直しの声はある。"},
-  jyoshi:{from:"情報センター",text:"学内Wi-Fiにつなぐ機器や、外部のクラウドにデータを送るサービスは、セキュリティ審査（約2か月）が必要。カメラは特に慎重に扱う。"},
-  jyoshi_deep:{from:"情報センター・インタビュー",text:"人数を数えるだけなら、映像を保存しないカメラやBluetoothセンサーの方式がある。他大学もそうしている。"},
-  minority:{from:"留学生",text:"来日した直後は日本の電話番号がなく、アプリのSMS認証ができなかった。最初の1週間はコンビニで済ませた。"},
-  minority_deep:{from:"留学生・インタビュー",text:"豚肉やアルコールが入っているか、表示だけではわからないのも困る。写真と英語の表示があると助かる。"},
-  survey:{from:"アンケート（回答640件）",text:"「学食を使いたいが時間がない」45%。「混雑状況がわかれば時間をずらす」58%。「スマホで事前注文したい」41%。"},
-  bottleneck:{from:"観察",text:"レジだけでなく返却口にも列。食事時間は平均12分なのに、席にいる時間は平均35分。食後にスマホや課題をしている人が多い。"},
-  workshop:{from:"ワークショップ",text:"学生・生協・学生課・パートで話し合い、目的を「ピークの30分をどう乗り切るか」に絞ることで合意した。"},
-  prototype:{from:"プロトタイピング",text:"紙の画面試作を見せたら「注文完了まで4画面は長い」「受取時間を選べるなら使う」と言われた。"},
-  benchmark:{from:"他大学の事例調査",text:"モバイルオーダーの利用率が8割を超えた大学がある一方、アプリ決済への切り替えで「待ち時間が3倍」と報道された大学もある。混雑表示は、映像を保存しない方式で導入された例がある。"}
+const SCR = {
+  intro:{st:0,c:[],p:[]},
+  s1:{st:1,c:["sa"],p:["el"]},
+  s2a:{st:2,c:["el"],p:["ba"]},
+  s2b:{st:2,c:["ba"],p:["el"]},
+  s3a:{st:3,c:["ra"],p:["rl"]},
+  s3b:{st:3,c:["ra"],p:["rl"]},
+  s3c:{st:3,c:["ra"],p:["rl"]},
+  s3d:{st:3,c:["ra"],p:["el","ba"]},
+  s4:{st:4,c:["rl"],p:["ba","el"]},
+  s5:{st:5,c:["se"],p:[]}
 };
-
-const GOALS = {
-  wait:{t:"「行列が長い」ことを問題とする",d:"目的：ピーク時の待ち時間を短くする"},
-  seat:{t:"「席が空かない」ことを問題とする",d:"目的：座席の回転をよくする"},
-  sales:{t:"「学生が学食を使わなくなった」ことを問題とする",d:"目的：生協の利用者と売上を取り戻す"},
-  data:{t:"結論を出す前に、アンケートと売上データを確認する",d:"学生課と生協にデータを見せてもらう"}
+const STAGE_TITLE = {
+  1:"何を問題とするか、どうなればよいかを決める",
+  2:"誰から・どの方法で聞くかを計画し、結果を見て計画を直す",
+  3:"集めた声を要求に整理し、解決策の部品を組み合わせて提案を書く",
+  4:"想定外のできごとによる要求の変更に対応する",
+  5:"1年後の結果で、解決策の効果を評価する"
 };
+const BLOCK = {s1:1,s2a:2,s2b:3,s3a:4,s3b:4,s3c:5,s3d:5,s4:6};
+const BLOCK_END = {s1:1,s2a:2,s2b:3,s3b:4,s3d:5};
+const BLOCK_MIN = {1:5,2:5,3:5,4:5,5:10,6:5}; // 作業時間の目安（分）
+const LIT = {sa:1,el:2,ba:3,ra:4,rl:6,se:7}; // 知識エリアを紹介するブロック
+const NEXT = {intro:"s1",s1:"s2a",s2a:"s2b",s2b:"s3a",s3a:"s3b",s3b:"s3c",s3c:"s3d",s3d:"s4",s4:"s5"};
 
-const SH = {
+const WHO = {
   student:{t:"学生",d:"学食を使う人・使わなくなった人"},
   staff:{t:"調理・レジのパート",d:"現場で毎日ピークを体験している"},
   manager:{t:"生協の店長",d:"食堂の運営者。大学とは別の組織で、独立採算"},
-  kyomu:{t:"教務課",d:"時間割や授業時間を担当する部署"},
+  kyomu:{t:"教務課の課長",d:"時間割や授業時間を担当する部署"},
   jyoshi:{t:"情報センター",d:"学内ネットワークとセキュリティを管理する部署"},
-  minority:{t:"留学生",d:"少数派だが、影響を受けやすい人たち"}
+  minority:{t:"留学生",d:"少数派だが、影響を受けやすい人たち"},
+  zaimu:{t:"財務課の課長",d:"大学の予算を管理する部署"},
+  shisetsu:{t:"施設課",d:"食堂の建物・机・椅子を管理する部署"}
+};
+const METHOD = {
+  interview:{t:"インタビュー",s:"インタビュー"},
+  survey:{t:"アンケート",s:"アンケート"},
+  observe:{t:"観察（現場を見る）",s:"観察"},
+  workshop:{t:"ワークショップ",s:"ワークショップ"},
+  prototype:{t:"プロトタイピング（画面の試作を見せる）",s:"試作を見せる"},
+  benchmark:{t:"ベンチマーク（他大学の事例調査）",s:"事例調査"}
+};
+const MKEYS = ["interview","survey","observe","workshop","prototype"];
+const c = (lv,n,dep,f,text)=>({ok:true,lv,n,dep,f,text});
+const x = why=>({ok:false,why});
+
+// 相手×方法ごとに決まっている結果。f＝この情報カードから分かること（要求の候補や、できごとの条件に使う）
+const HEAR = {
+  student:{
+    interview:c(3,"5人","深く聞ける",["seat","timeshift","userfit"],"並ぶのもつらいけど、一番困るのは席が空いていないこと。空いている時間がわかれば、ずらしてもいい。"),
+    survey:c(3,"640人","数字で分かる",["stats","timeshift","pre","userfit"],"「学食を使いたいが時間がない」45%。「混雑状況がわかれば時間をずらす」58%。「スマホで事前注文したい」41%。"),
+    observe:c(2,"食堂の利用者","実際の行動",["seat","stay"],"食事時間は平均12分なのに、席にいる時間は平均35分。食後にスマホや課題をしている人が多い。"),
+    workshop:c(2,"6人","意見をまとめられる",["seat","agree"],"学生6人で話し合い、「席が空かないこと」と「ピークの30分の行列」を優先する課題にすることで合意した。"),
+    prototype:c(2,"3人","画面を見ての意見",["pre","proto","userfit"],"紙の画面試作を見せたら「注文完了まで4画面は長い」「受取時間を選べるなら使う」と言われた。")
+  },
+  staff:{
+    interview:c(3,"3人","深く聞ける",["kitchen","bottle"],"混むのは30分だけ。そのために人を増やすと前後は手が余る。事前注文が同じ時刻に大量に来たら、フライヤーが足りない。昼は返却口にも列ができる。"),
+    survey:c(1,"8人","数字にならない",[],"回答は8人だけ。「忙しい」「返却口が詰まる」という声はあるが、人数が少なく、数字としては使えない。"),
+    observe:c(3,"現場全体","実際の様子",["bottle","kitchen"],"レジだけでなく返却口にも列。バーコード決済は、昔のICカードより会計に時間がかかっている。12:20から調理場の手が回っていない。"),
+    workshop:x("勤務時間中は、現場を離れて参加できない"),
+    prototype:c(1,"2人","限られる",[],"レジ側の画面の試作を見せた。「会計の手順が増えると困る」という指摘はあったが、利用者の意見ではない。")
+  },
+  manager:{
+    interview:c(2,"1人","経営の事情まで聞ける",["coop","profit"],"生協は大学とは別の組織で、独立採算。システムの月額や決済手数料（売上の約3%）を払う余裕はない。本音は、ピーク以外の時間にも来てほしい。"),
+    survey:x("1人なので、集計しても意味がない"),
+    observe:c(1,"1人","限られる",[],"売り場の様子は見えたが、経営の事情や費用の話は見えなかった。"),
+    workshop:c(2,"3人（店長・学生課・学生）","立場をまたいで話せる",["coop","profit","agree"],"店長・学生課・学生で話し、運用費を誰がどう負担するかの論点を整理できた。目的を「ピークの30分をどう乗り切るか」に絞ることで一致した。"),
+    prototype:x("運用や費用の事情は、画面の試作では分からない")
+  },
+  kyomu:{
+    interview:c(2,"1人","承認の手順が聞ける",["timetable"],"昼休みを延ばすには時間割の全面見直しが必要。教授会の承認がいるので、早くて再来年度から。近くの大学では、昼休みが縮んで学生の不満が出て、授業時間を元に戻した例がある。"),
+    survey:x("対象が少なく、集計できない"),
+    observe:x("現場で見るものがない"),
+    workshop:x("課長は日程が合わず、参加できない"),
+    prototype:x("時間割の話に、画面の試作は関係しない")
+  },
+  jyoshi:{
+    interview:c(2,"2人","ルールが聞ける",["privacy"],"学内Wi-Fiにつなぐ機器や、外部のクラウドにデータを送るサービスは、セキュリティ審査（約2か月）が必要。カメラは特に慎重に扱う。人数を数えるだけなら、映像を保存しない方式がある。"),
+    survey:x("対象が少なく、集計できない"),
+    observe:x("現場で見るものがない"),
+    workshop:x("審査担当は、検討の場には参加できない"),
+    prototype:c(1,"1人","限られる",["privacy"],"画面の試作を見せたら「学籍番号を外部に送る設計は審査が必要」と指摘された。")
+  },
+  minority:{
+    interview:c(3,"4人","深く聞ける",["intl"],"来日した直後は日本の電話番号がなく、アプリのSMS認証ができなかった。最初の1週間はコンビニで済ませた。豚肉やアルコールの有無が表示だけでは分からないのも困る。"),
+    survey:c(2,"留学生50人","数字で分かる",["intl","stats"],"留学生の35%が「アプリの登録でつまずいた」と回答。「英語表示があれば使う」は70%。"),
+    observe:c(1,"数人","理由は分からない",[],"食堂で券売機の前に立ち止まる留学生を見かけたが、なぜ困っているのかまでは分からなかった。"),
+    workshop:c(2,"5人","意見をまとめられる",["intl","agree"],"留学生5人で話し、「登録のしやすさ」「英語と写真の表示」「現金で使えること」を優先事項としてまとめた。"),
+    prototype:c(3,"3人","画面を見ての意見",["intl","proto","userfit"],"試作を見せたら、「SMS認証のところで止まる」「英語と写真がないと使えない」とすぐに指摘された。")
+  },
+  zaimu:{
+    interview:c(2,"1人","予算の条件が聞ける",["budget"],"初年度は学生課の予算150万円が上限。ただし、費用を2年度に分けて計上することはできる。運用費は、効果を示せれば翌年度から要求できる。"),
+    survey:x("対象が少なく、集計できない"),
+    observe:x("現場で見るものがない"),
+    workshop:x("課長は、検討の場には参加できない"),
+    prototype:x("予算の話に、画面の試作は関係しない")
+  },
+  shisetsu:{
+    interview:c(2,"1人","設備の制約が聞ける",["facility"],"食堂の机と椅子は、消防法の通路幅の基準でもう増やせない。ただし、配置を変えるだけなら、席数を変えずに通りやすくできる余地がある。"),
+    survey:x("対象が少なく、集計できない"),
+    observe:c(2,"食堂全体","実測できる",["facility","seat"],"席は約550。通路幅は基準ぎりぎりだが、壁際と中央の机の向きを変えれば、席数を変えずに座りやすい配置にできる。席が空かないのは、数が足りないのではなく回転が悪いことが原因に見える。"),
+    workshop:c(1,"1人","限られる",["facility"],"日程が合わず、担当者1人だけが参加した。設備の制約は共有できたが、意見は広がらなかった。"),
+    prototype:x("設備の話に、画面の試作は関係しない")
+  }
+};
+const BENCH = c(2,"他大学5校","事例から学べる",["bench","userfit","pre"],"モバイルオーダーの利用率が8割を超えた大学がある一方、アプリ決済への切り替えで「待ち時間が3倍」と報道された大学もある。混雑表示は、映像を保存しない方式で導入された例がある。");
+const DATA = c(2,"学内データ","全体の数字",["peak","stats"],"食堂の満足度は学内施設で最下位。来店の7割が12:20〜12:45に集中し、ピーク時の平均待ち時間は14分。");
+const FLOOR = c(2,"食堂の様子","自分の目で見た範囲",["seat"],"レジの前と返却口の2か所に列ができている。席はほとんど埋まって見える。なぜ席が空かないのかは、見ただけでは分からない。全体の人数や待ち時間の数字は取れていない。");
+const BOSS = c(2,"課長1人","経緯と関係者",["budget"],"他大学のモバイルオーダーの導入事例を見て、アプリを考えた。予算は初年度150万円。関係しそうな部署は、教務課・情報センター・財務課・施設課・生協。現場の事実や数字は、まだ手元にない。");
+const FIRST = {
+  data:{label:"学内の満足度調査・売上データ",card:DATA,t:"学内データ（満足度調査・売上）を見る",gain:"来店が集中する時間帯と、ピーク時の待ち時間が数字で分かる",lose:"現場の様子や、課長の考えは分からない",fill:"選ばなかった情報は、Stage 2の聞き取りで補えます（現場の様子は観察、経緯や関係者は課長・各部署への聞き取りなど）。"},
+  floor:{label:"昼休みの食堂の様子（自分で見た）",card:FLOOR,t:"昼休みの食堂を見に行く",gain:"レジと返却口の2か所に列があり、席がほぼ埋まっていることが分かる",lose:"原因は確かめられない。全体の数字もない",fill:"選ばなかった情報は、Stage 2の聞き取りで補えます（全体の数字はアンケート、経緯や関係者は課長・各部署への聞き取りなど）。"},
+  boss:{label:"課長への聞き取り（経緯と関係者）",card:BOSS,t:"課長に、経緯と関係者を聞く",gain:"アプリを考えた経緯、予算、関係する部署の一覧が分かる",lose:"現場の事実と数字がない",fill:"選ばなかった情報は、Stage 2の聞き取りで補えます（数字はアンケート、現場の様子は観察など）。"}
 };
 
 const TECH = {
-  interview:{t:"インタビュー",good:"一人ひとりの本音や理由を深く聞ける",weak:"聞ける人数が少ない。全体の傾向はわからない",ex:"Stage 2で選んだ人の本音が聞ける"},
-  survey:{t:"アンケート",good:"多くの人の傾向を数字でつかめる",weak:"「なぜ」がわかりにくい。質問の作り方で結果が偏る",ex:"「混雑がわかれば時間をずらす」人の割合などがわかる"},
-  observe:{t:"観察（現場を見る）",good:"本人も気づいていない実際の行動がわかる",weak:"見た理由まではわからない。時間がかかる",ex:"返却口の列や、食後も席に残る人の多さに気づける"},
-  workshop:{t:"ワークショップ",good:"立場の違う人が集まり、目的や優先順位を合意できる",weak:"日程調整が大変。声の大きい人に引っぱられやすい",ex:"関係者で目的に合意でき、後の変更にも強くなる"},
-  prototype:{t:"プロトタイピング（画面の試作）",good:"形を見せると、言葉では出ない意見が出る",weak:"作るまでの手間がかかる。見た目の話に偏りやすい",ex:"アプリの使いにくさを、作る前に発見できる"},
-  benchmark:{t:"ベンチマーク（他大学の事例）",good:"他の成功・失敗から学べる。費用の目安がわかる",weak:"自分たちの状況と同じとは限らない",ex:"実際の成功例と失敗例、安く作れる方法がわかる"}
+  interview:{good:"一人ひとりの本音や理由を深く聞ける",weak:"聞ける人数が少ない。全体の傾向はわからない"},
+  survey:{good:"多くの人の傾向を数字でつかめる",weak:"「なぜ」がわかりにくい。質問の作り方で結果が偏る"},
+  observe:{good:"本人も気づいていない実際の行動がわかる",weak:"見た理由まではわからない。時間がかかる"},
+  workshop:{good:"立場の違う人が集まり、目的や優先順位を合意できる",weak:"日程調整が大変。声の大きい人に引っぱられやすい"},
+  prototype:{good:"形を見せると、言葉では出ない意見が出る",weak:"作るまでの手間がかかる。見た目の話に偏りやすい"},
+  benchmark:{good:"他の成功・失敗から学べる。費用の目安がわかる",weak:"自分たちの状況と同じとは限らない"}
 };
 
-const QUIZ_TYPES = ["ビジネス要求","ステークホルダー要求","ソリューション要求（機能）","ソリューション要求（非機能）","移行要求"];
-const QUIZ = [
-  {q:"食堂の満足度を、学内施設の最下位から平均以上に上げる",a:0,why:"組織（大学）として達成したい目標なので「ビジネス要求」です。"},
-  {q:"学生は、空いている時間を事前に知りたい",a:1,why:"特定の関係者（学生）が必要としていることなので「ステークホルダー要求」です。"},
-  {q:"混雑状況を3段階（空き・やや混雑・満席）でスマホに表示する",a:2,why:"システムが「何をするか」なので「機能要求」です。"},
-  {q:"カメラの映像は保存せず、人数だけを記録すること",a:3,why:"安全性・プライバシーなど「どのような品質で動くか」は「非機能要求」です。"},
-  {q:"運用開始の前に、パートさん向けの操作説明会を開く",a:4,why:"今の状態から新しい状態へ移るときだけ必要なことなので「移行要求」です。"}
-];
-
+// ---- 要求の候補（情報カードから作れるものだけが出る。need＝この情報のどれかがあれば候補になる）----
+const RT = ["ビジネス要求","ステークホルダー要求","ソリューション要求（機能）","ソリューション要求（非機能）","移行要求"];
+const RT_WHY = ["組織（大学）が達成したい目標・守るべき条件なので「ビジネス要求」です。","特定の関係者が必要としていることなので「ステークホルダー要求」です。","システムが何をするかなので「ソリューション要求（機能）」です。","どのくらいの品質で動くか（安全性・使いやすさ・運用など）なので「ソリューション要求（非機能）」です。","今の状態から新しい状態へ移るときだけ必要なことなので「移行要求」です。"];
 const REQS = {
-  r1:{t:"ピーク時の待ち時間を5分以内にする",k:"ビジネス要求"},
-  r2:{t:"スマホから事前に注文・決済できる",k:"機能要求"},
-  r3:{t:"スマホがなくても（現金・ICカードで）利用できる",k:"ステークホルダー要求"},
-  r4:{t:"混雑状況をスマホで確認できる",k:"機能要求"},
-  r5:{t:"映像や個人情報を保存しない",k:"非機能要求"},
-  r6:{t:"初年度の費用を150万円以内にする",k:"ビジネス要求（制約）"},
-  r7:{t:"日本語以外でも使える",k:"非機能要求"},
-  r8:{t:"生協の売上を維持する",k:"ビジネス要求"}
+  g1:{t:"ピーク時の待ち時間を5分以内にする",ty:0,alt:[3],need:null},
+  g2:{t:"初年度の費用を150万円以内にする",ty:0,need:null},
+  g3:{t:"映像や個人情報を、必要以上に保存しない",ty:3,alt:[0],need:null},
+  r_seat:{t:"食べ終わった人が席を空けやすい状態にする",ty:1,need:["seat","stay"]},
+  r_time:{t:"空いている時間を事前に知りたい",ty:1,alt:[2],need:["timeshift"]},
+  r_pre:{t:"スマホから事前に注文・決済できる",ty:2,need:["pre"]},
+  r_vis:{t:"混雑状況を3段階でスマホに表示する",ty:2,alt:[1],need:["timeshift","bench"]},
+  r_noph:{t:"スマホがなくても（現金・ICカードで）利用できる",ty:1,alt:[3],need:["intl"]},
+  r_lang:{t:"日本語以外でも使える",ty:3,need:["intl"]},
+  r_coop:{t:"運用費を生協に負担させない",ty:1,need:["coop"]},
+  r_sales:{t:"生協の売上を維持する",ty:0,need:["profit"]},
+  r_kit:{t:"調理能力を超える注文を受けない",ty:3,alt:[1],need:["kitchen"]},
+  r_ret:{t:"返却口の列を短くする",ty:1,need:["bottle"]},
+  r_sec:{t:"学内のセキュリティ審査に通す",ty:3,need:["privacy"]},
+  r_fac:{t:"通路幅の基準を守る（机と椅子は増やさない）",ty:3,need:["facility"]},
+  r_train:{t:"運用の前に、パートさん向けの手順の説明をする",ty:4,need:["kitchen","bottle"]},
+  r_fund:{t:"費用を2年度に分けて計上できるようにする",ty:0,need:["budget"]}
 };
+const QUIZ_ORDER = ["g1","r_seat","g3","r_time","r_vis","r_train","r_noph","r_kit","g2"];
 
-const SOL = {
-  app:{t:"モバイルオーダー（事前注文・受取時間の指定）",d:"既存のサービスを使う。初期約50万円＋月額・決済手数料",cost:170},
-  visual:{t:"混雑状況の見える化",d:"人数を数えるセンサーを置き、スマホに3段階で表示する",cost:60},
-  ret:{t:"返却口・動線の改善と「食後の席」対策",d:"返却口を増やし分別表示を改善。食後は空き教室やラウンジの利用を案内する",cost:90},
-  shift:{t:"時間割を見直して昼休みを延ばす",d:"システムは作らない。教授会の承認が必要",cost:0},
-  kc:{t:"キッチンカー・弁当ワゴンで販売場所を分散",d:"講義棟の前で販売し、食堂への集中を減らす",cost:15},
-  seats:{t:"食堂の席を増やす",d:"机と椅子を追加する",cost:40}
+// ---- 解決策の部品 ----
+const PARTS = {
+  app:{t:"モバイルオーダー（事前注文・受取時間の指定）",s:"モバイルオーダー",d:"既存のサービスを使う。初期約30万円＋月額約3万円＋決済手数料（売上の約3%）の年間見積もり",cost:170,ctr:true,aim:["大","小","中"],when:"半年後から",pre:"厨房と受取口の余力／生協の運用費／セキュリティ審査／スマホがない人への対応"},
+  visual:{t:"混雑状況の見える化",s:"混雑状況の見える化",d:"人数を数えるセンサーを置き、スマホに3段階で表示する",cost:60,ctr:true,aim:["中","中","小"],when:"3か月後から",pre:"学生が見て行動を変えるか／カメラの扱い（審査）／運用費"},
+  cashier:{t:"会計を増やす（セルフレジ）",s:"会計を増やす",d:"セルフレジを置き、会計の列を分ける。注文や調理はそのまま",cost:80,ctr:true,aim:["中","−","小"],when:"半年後から",pre:"置く場所と動線／キャッシュレスの会計に時間がかかる原因（現場の観察で分かる）"},
+  ret:{t:"返却口・動線の改善と「食後の席」対策",s:"返却口・動線の改善",d:"返却口を増やし分別表示を改善。食後は空き教室やラウンジの利用を案内する",cost:90,ctr:true,need:["bottle","seat","stay","facility"],aim:["中","大","小"],when:"3か月後から",pre:"食後の居残りを強制できない／施設課との調整",lockWhy:"パート・学生・施設課への聞き取りや観察がないため"},
+  shift:{t:"時間割を見直して昼休みを延ばす",s:"昼休みの延長",d:"システムは作らない。教授会の承認が必要",cost:0,ctr:true,need:["timetable"],aim:["中","中","小"],when:"1年後は途中の効果。2年後に大きく効く見込み",pre:"教授会の承認／全学の時間割の調整",lockWhy:"教務課に聞いていないため"},
+  kc:{t:"キッチンカー・弁当ワゴンで販売場所を分散",s:"キッチンカー・弁当ワゴン",d:"講義棟の前で販売し、食堂への集中を減らす",cost:15,ctr:true,aim:["中","小","中"],when:"すぐ",pre:"事業者の採算／置く場所／生協との関係"},
+  seats:{t:"食堂の席を増やす",s:"席を増やす",d:"机と椅子を追加する",cost:40,ctr:true,aim:["−","中","小"],when:"半年後から",pre:"通路幅の基準（施設課）"},
+  layout:{t:"席の配置を変える",s:"席の配置の見直し",d:"机の並べ方を見直し、座りやすく・通りやすくする。席数は変えない。補助専用",cost:20,ctr:false,need:["facility","seat","stay"],aim:["−","中","−"],when:"3か月後から",pre:"通路幅を守れるか",lockWhy:"施設課・席・食後の様子について聞いていないため"},
+  menu:{t:"ピーク時のメニューを絞る",s:"ピーク時のメニューを絞る",d:"12:20〜12:45は、早く出せるメニューに限る。補助専用",cost:10,ctr:false,aim:["中","−","小"],when:"すぐ",pre:"パートの調理手順／選べる料理が減ることへの不満"},
+  pilot:{t:"一部の時間帯で試行してから広げる",s:"一部の時間帯での試行",d:"最初は混む30分だけで試し、効果を見てから全体に広げる。補助専用",cost:15,ctr:false,aim:["−","−","−"],when:"判断を1年遅らせる",pre:"効果が小さくなる／判断を1年遅らせる。中心の部品の費用を30%減らす"}
 };
+const PART_ORDER = ["app","visual","cashier","ret","shift","kc","seats","layout","menu","pilot"];
 const EFFECT = {
-  app:{wait:60,seat:30,sales:55},
-  visual:{wait:40,seat:40,sales:25},
-  ret:{wait:55,seat:70,sales:40},
-  shift:{wait:75,seat:75,sales:35},
-  kc:{wait:45,seat:35,sales:20}
+  app:{wait:65,seat:30,sales:50},
+  visual:{wait:45,seat:45,sales:30},
+  cashier:{wait:50,seat:18,sales:30},
+  ret:{wait:50,seat:70,sales:30},
+  shift:{wait:55,seat:55,sales:30},
+  kc:{wait:45,seat:30,sales:45},
+  seats:{wait:18,seat:50,sales:28}
+};
+const AUX = { // 補助にしたときの効果の上乗せ
+  app:{wait:8,seat:2,sales:8}, visual:{wait:6,seat:6,sales:3}, cashier:{wait:7,seat:1,sales:4}, ret:{wait:5,seat:10,sales:5},
+  shift:{wait:4,seat:4,sales:2}, kc:{wait:6,seat:5,sales:3}, seats:{wait:2,seat:8,sales:2}, layout:{wait:2,seat:8,sales:2},
+  menu:{wait:8,seat:0,sales:-2}, pilot:{wait:-6,seat:-6,sales:-6}
+};
+const REL = { app:["manager","jyoshi","minority","staff"], visual:["jyoshi","manager"], cashier:["staff","manager"], ret:["staff","shisetsu"], shift:["kyomu"], kc:["manager"], layout:["shisetsu"], menu:["staff","manager"], pilot:[], seats:["shisetsu"] };
+
+const PUR = {
+  user:{t:"利用者や現場の困りごと",d:"誰が、何に、どのくらい困っているか",f:["seat","stay","timeshift","bottle","kitchen","intl"]},
+  money:{t:"お金と運用の条件",d:"誰が払い、誰が続けるのか",f:["coop","profit","budget"]},
+  rule:{t:"ルールや承認の条件",d:"セキュリティ、時間割、設備などの制約",f:["privacy","timetable","facility"]},
+  num:{t:"全体の数字",d:"どのくらいの人が、どの程度困っているか",f:["stats","peak"]},
+  case:{t:"他の大学の実例",d:"うまくいった例と失敗した例",f:["bench"]}
+};
+const MEAS = {wait:"ピーク時の平均待ち時間（分）",seat:"席にいる時間・席が空くまでの時間",sales:"食堂の利用者数・売上"};
+const BLIND = {
+  wait:"席が見つからず食べ損ねた人や、食堂に来なくなった人は、待ち時間に出てきません",
+  seat:"行列の長さは分かりません。席が空いても、列が短くなるとは限りません",
+  sales:"混雑の原因が減ったかどうかは分かりません。利用者数や売上は、混雑以外の理由でも変わります"
+};
+const GOALS = {
+  wait:{t:"「行列が長い」ことを問題とする",short:"行列が長い",d:"目的：ピーク時の待ち時間を短くする",heavy:"重くなる声：並ぶ学生、レジや返却口のパート"},
+  seat:{t:"「席が空かない」ことを問題とする",short:"席が空かない",d:"目的：座席の回転をよくする",heavy:"重くなる声：席を探す学生、食堂の建物を管理する施設課"},
+  sales:{t:"「学生が学食を使わなくなった」ことを問題とする",short:"学生が学食を使わなくなった",d:"目的：生協の利用者と売上を取り戻す",heavy:"重くなる声：食堂を運営する生協の店長"}
+};
+const CRIT = {
+  goal:"目的（Stage 1で決めた問題）にどれだけ効くか",
+  cost:"費用の小ささ",
+  people:"困る人の多さ・影響の大きさ",
+  easy:"実現しやすさ（時間・手間）"
+};
+const WORRY = {
+  cost:"費用が予算に収まるか",
+  use:"実際に使われるか",
+  field:"現場（調理・レジ）の負担",
+  rule:"ルールや承認が通るか",
+  term:"効果が出るまでの期間"
 };
 
 // ============ 回答の集計（匿名） ============
-// GASウェブアプリのURL（集計/集計の準備手順.md を参照）。空のときは何も送らない
+// 試作では空にして、何も送らない。本番用にするときは集計/集計の準備手順.md のURLを入れる
 const COLLECT_URL = "https://script.google.com/macros/s/AKfycbxvcyobiUEiVW8I4wfD2AWj-0nNaLyTBcAnhnyVyb3gxmn2pF9v_DsjrqY1MMnG_pP2/exec";
 const UID = (()=>{
   const mk = ()=>(Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)).replace(/[^a-z0-9]/g,"").slice(0,16).padEnd(12,"0");
@@ -222,7 +391,7 @@ const UID = (()=>{
 let sendQ=[], sending=false, seq=0;
 function report(items){
   if(!COLLECT_URL) return;
-  const t=Date.now()*100+(seq++%100);   // 端末時刻＋連番。同じ問いは新しい方で上書き集計される
+  const t=Date.now()*100+(seq++%100);
   items.forEach(it=>sendQ.push({q:it.q,v:it.v,t,n:0}));
   flush();
 }
@@ -235,7 +404,7 @@ async function flush(){
     const r=await fetch(COLLECT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({uid:UID,items:batch.map(({q,v,t})=>({q,v,t}))})});
     const j=await r.json();
-    if(!j.ok && j.retry) retry=true;      // 受付停止中（closed）は再送しない
+    if(!j.ok && j.retry) retry=true;
   }catch(e){ retry=true; }
   sending=false;
   if(retry){
@@ -245,27 +414,174 @@ async function flush(){
 }
 window.addEventListener("online",flush);
 
+// ============ 講師の合図（方式A） ============
+// 受付中は、各ワークの終わりで講師が「次を開く」を押すまで先へ進めない。
+// 待っている間だけ、COLLECT_URL?m=state を約10秒おきに確認する。確認が3回続けて失敗したら、待たずに進める。
+const BLK_OF = scr => scr==="s5" ? 7 : (BLOCK[scr]||0);
+const GATE = {known:false, open:false, n:0, fail:0, free:false, timer:null, busy:false};
+function gated(target){
+  if(!COLLECT_URL || GATE.free) return false;
+  const need = BLK_OF(target);
+  if(need <= BLK_OF(S.screen)) return false;
+  if(!GATE.known) return true;
+  return GATE.open && GATE.n < need;
+}
+function pendingTarget(){
+  const s = S.screen;
+  if(s==="intro") return "s1";
+  if(S.decided && (BLOCK_END[s] || (s==="s4" && S.ev===S.events.length-1))) return NEXT[s];
+  return null;
+}
+function waiting(){ const t = pendingTarget(); return !!t && gated(t); }
+function pollGate(){
+  GATE.timer = null;
+  if(GATE.busy || !COLLECT_URL || GATE.free || !waiting()) return;
+  GATE.busy = true;
+  const was = waiting();
+  fetch(COLLECT_URL+"?m=state", {cache:"no-store"}).then(r=>r.json()).then(j=>{
+    if(!j || !j.ok) throw new Error("state");
+    GATE.known = true; GATE.open = !!j.open; GATE.n = +j.released || 0; GATE.fail = 0;
+  }).catch(()=>{ if(++GATE.fail >= 3) GATE.free = true; }).then(()=>{
+    GATE.busy = false;
+    const now = waiting();
+    if(was !== now){ const y0=window.scrollY; render(); window.scrollTo(0,y0); }
+    else syncGate();
+  });
+}
+function syncGate(){
+  if(!waiting()){ clearTimeout(GATE.timer); GATE.timer = null; return; }
+  if(GATE.timer || GATE.busy) return;
+  const wait = !GATE.known ? 0 : GATE.fail ? 3000+Math.random()*2000 : 7000+Math.random()*6000;
+  GATE.timer = setTimeout(pollGate, wait);
+}
+
 // ============ 状態 ============
 const init = () => ({
   screen:"intro", decided:false,
-  s1:null, goal:null, sh:[], tech:[], cards:[], newCards:[],
-  quiz:{}, musts:[], sol:null, seatTried:false, seatMsg:false,
-  events:[], ev:0, evChoice:{}
+  first:null, prob:null, goal:null, measure:null,
+  purpose:null, plan:[], iv:[], newCards:[], gap:null, gapBefore:[], gapAfter:[],
+  quizIds:[], quiz:{}, musts:[], wont:null, crit:null,
+  parts:[], center:null, worry:null,
+  evid:[], wk:null, pText:"",
+  events:[], extraEv:[], ev:0, evChoice:{}, chg:[]
 });
 let S = init();
-const history = [];          // 各画面に入った時点の状態（選ぶ前）を積む
+const history = [];
 let entrySnap = JSON.stringify(S);
-const has = id => S.cards.includes(id);
-function addCard(id){ if(!S.cards.includes(id)){ S.cards.push(id); S.newCards.push(id); } }
 
-const STAGE_NO = {intro:0,s1:1,s2:2,s3:3,s4a:4,s4b:4,s4c:4,s5:5,s6:6};
-const BACCM_ON = {intro:[],s1:[0,1],s2:[0,1,2],s3:[0,1,2],s4a:[0,1,2],s4b:[0,1,2],s4c:[0,1,2,3],s5:[0,1,2,3,4],s6:[0,1,2,3,4,5]};
+// ---- 手持ちのカード（選んだ内容から求める）----
+function cardKeys(){ return (S.first?[S.first]:[]).concat(S.iv); }
+function cardOf(key){
+  if(FIRST[key]) return Object.assign({key,label:FIRST[key].label},FIRST[key].card);
+  if(key==="bench") return Object.assign({key,label:"他大学の事例調査"},BENCH);
+  const [w,m]=key.split(".");
+  return Object.assign({key,who:w,m,label:WHO[w].t+"・"+METHOD[m].s},HEAR[w][m]);
+}
+const infoCards = ()=>cardKeys().map(cardOf);
+const factSet = ()=>{ const s=new Set(); infoCards().forEach(k=>k.f.forEach(f=>s.add(f))); return s; };
+const hasFact = f => factSet().has(f);
+const hasWho = w => S.iv.some(k=>k.startsWith(w+"."));
+const hasMethod = m => S.iv.some(k=> m==="benchmark" ? k==="bench" : k.endsWith("."+m));
+const mustHas = r => S.musts.includes(r);
+const hasPart = k => S.parts.includes(k);
+const reqAvail = id => !REQS[id].need || REQS[id].need.some(hasFact);
+const reqList = ()=>Object.keys(REQS).filter(reqAvail);
+function reqSource(id){
+  const r=REQS[id];
+  if(!r.need) return "一般的な要求（情報カードがなくても挙がる）";
+  const cs=infoCards().filter(k=>k.f.some(f=>r.need.includes(f))).map(k=>k.label);
+  return "出所：" + (cs.length? cs.slice(0,3).join("、")+(cs.length>3?" ほか":"") : "なし");
+}
+const mustAny = reqs => reqs.some(mustHas);
+function addNew(keys){ S.newCards = keys.slice(); }
+const isRight = (id,j)=> j===REQS[id].ty || (REQS[id].alt||[]).includes(j);
+const tidy = id => S.quiz[id]!==undefined && !isRight(id,S.quiz[id]); // 分類を外した要求＝要整理
+const typeLabel = id => tidy(id) ? "種類：未確定（要整理）" : RT[REQS[id].ty];
 
+const itPart = ()=> hasPart("app") ? "app" : hasPart("visual") ? "visual" : null;
+function focalPart(P){ if(S.center && P.includes(S.center)) return S.center; return P.filter(k=>k!=="pilot").sort((a,b)=>PARTS[b].cost-PARTS[a].cost)[0]||null; }
+function totalCost(P=S.parts){
+  let t=0; P.forEach(k=>{ t+=PARTS[k].cost; });
+  if(P.includes("visual") && hasFact("bench")) t-=20;
+  if(P.includes("seats") && hasFact("facility")) t-=15; // 基準に収まる範囲に絞る
+  if(P.includes("pilot")){ const f=focalPart(P); if(f) t-=Math.round((PARTS[f].cost-(f==="visual"&&hasFact("bench")?20:0))*0.3); }
+  return t;
+}
+function synergies(P=S.parts){
+  const h=k=>P.includes(k), o=[];
+  if(h("app")&&h("ret")) o.push({t:"モバイルオーダー＋返却口・動線の改善：受取口の対応が入るので、注文が集中しても受取口があふれにくい",eff:8});
+  if(h("app")&&!h("ret")&&!h("menu")) o.push({t:"モバイルオーダーは、厨房と受取口に余力があることが前提です。調理能力や受取口の状況を確かめましたか？",pre:true});
+  if(h("app")&&h("menu")) o.push({t:"モバイルオーダー＋ピーク時のメニューを絞る：作る品数が減るので、注文が集中しても厨房が回りやすい",eff:4});
+  if(h("visual")&&h("kc")) o.push({t:"混雑状況の見える化＋キッチンカー：空いている売り場が分かるので、分散が進みます",eff:6});
+  if(h("ret")&&h("layout")) o.push({t:"返却口・動線の改善＋席の配置の見直し：席の回転がさらによくなります",eff:8,sat:3});
+  if(h("shift")&&h("visual")) o.push({t:"昼休みの延長＋混雑状況の見える化：延長が実現するまでの1年半を、見える化でつなげます",eff:3});
+  if(h("app")&&h("pilot")) o.push({t:"モバイルオーダー＋一部の時間帯での試行：使われなければ広げない判断ができ、費用も下がります",risk:-5});
+  if(h("cashier")&&h("menu")) o.push({t:"会計を増やす＋ピーク時のメニューを絞る：提供も会計も早まるので、列が短くなりやすい",eff:5});
+  if(h("seats")&&h("layout")) o.push({t:"席を増やす＋席の配置の見直し：通路幅に収まる配置にできるので、増設の制約を守りやすい",eff:4});
+  if(h("seats")&&hasFact("facility")) o.push({t:"施設課の話では、通路幅の基準で机と椅子はもう増やせません。基準に収まる範囲に絞るため、効果は小さくなります",pre:true});
+  if(h("pilot")&&P.length===1) o.push({t:"「試行」は補助専用です。中心になる部品と組み合わせてください",pre:true});
+  if(h("menu")&&P.length===1) o.push({t:"「ピーク時のメニューを絞る」は補助専用です。中心になる部品と組み合わせてください",pre:true});
+  return o;
+}
+
+// ---- 要求と組み合わせの対応（✓満たす／△条件つき／✕満たさない）----
+function fitOf(id,P=S.parts){
+  const h=k=>P.includes(k), cost=totalCost(P);
+  const by=(yes,part)=> yes.some(h)?"✓" : part.some(h)?"△":"✕";
+  switch(id){
+    case "g1": return by(["app","shift"],["visual","ret","kc","layout","cashier","menu"]);
+    case "g2": return cost<=BUDGET?"✓":(cost<=BUDGET*1.2?"△":"✕");
+    case "g3": return (h("app")||h("visual"))?"△":"✓";
+    case "r_seat": return by(["ret","layout"],["shift","kc","seats"]);
+    case "r_time": return by(["visual"],["app","pilot"]);
+    case "r_pre": return by(["app"],[]);
+    case "r_vis": return by(["visual"],[]);
+    case "r_noph": return h("app")?"△":"✓";
+    case "r_lang": return (h("app")||h("visual"))?"△":"✓";
+    case "r_coop": return h("app")?"✕":(h("visual")||h("kc")||h("cashier"))?"△":"✓";
+    case "r_sales": return by(["app","kc"],["visual","ret","shift","cashier"]);
+    case "r_kit": return h("app")&&!h("ret")?(h("menu")?"△":"✕"):"✓";
+    case "r_ret": return by(["ret"],["layout"]);
+    case "r_sec": return (h("app")||h("visual"))?"△":"✓";
+    case "r_fac": return h("seats")?(h("layout")?"△":"✕"):"✓";
+    case "r_train": return h("pilot")?"✓":(h("ret")||h("app")||h("kc")||h("cashier")||h("menu"))?"△":"✕";
+    case "r_fund": return (cost<=BUDGET||h("pilot"))?"✓":(cost<=BUDGET*1.2?"△":"✕");
+  }
+  return "△";
+}
+const fitCls = s=>s==="✓"?"ok":(s==="△"||s==="？")?"mid":"ng";
+
+// ---- 計画の見直し（足りない点）----
+const GAPS = {
+  voice:{t:"現場や利用者の声が足りない",test:()=>!(hasFact("seat")||hasFact("timeshift")||hasFact("bottle")||hasFact("kitchen"))},
+  num:{t:"全体の数字（どのくらいの人が困っているか）が足りない",test:()=>!(hasFact("stats")||hasFact("peak"))},
+  obs:{t:"現場の実際の様子（観察）が足りない",test:()=>!hasMethod("observe") && S.first!=="floor"},
+  money:{t:"お金と運用の条件（誰が払うか）を聞いていない",test:()=>!(hasFact("coop")||hasFact("budget"))},
+  rule:{t:"ルールや承認の条件（セキュリティ・時間割・設備）を聞いていない",test:()=>!(hasFact("privacy")||hasFact("timetable")||hasFact("facility"))},
+  minor:{t:"少数派の人（留学生など）の声がない",test:()=>!hasFact("intl")}
+};
+const gapNow = ()=>Object.keys(GAPS).filter(k=>GAPS[k].test());
+
+// ---- 提案の弱点 ----
+function weaknesses(){
+  const w=[], P=S.parts;
+  const miss=[...new Set(P.flatMap(k=>REL[k]||[]))].filter(a=>!hasWho(a));
+  if(miss.length) w.push({id:"who",t:"選んだ部品に関わる相手のうち、聞けていない人がいる："+miss.map(a=>WHO[a].t).join("、")});
+  const ev=S.evid.map(cardOf);
+  const whos=new Set(ev.filter(k=>k.who).map(k=>k.who));
+  if(ev.length && whos.size<=1 && !ev.some(k=>k.key==="data"||k.key==="bench")) w.push({id:"one",t:"根拠にしたカードが、1つの相手の声だけに偏っている"});
+  if(!hasFact("stats")) w.push({id:"num",t:"アンケートやデータなど、全体の数字の裏付けがない"});
+  if(!hasMethod("observe") && S.first!=="floor" && (hasPart("ret")||hasPart("layout")||hasPart("app")||hasPart("cashier"))) w.push({id:"obs",t:"現場の実際の様子を見ていない"});
+  return w;
+}
+
+// ============ 画面の流れ ============
 function go(screen){
   history.push(entrySnap);
-  S.screen = screen; S.decided = false; S.newCards = []; S.seatMsg = false;
-  if(screen==="s5"){ S.events = buildEvents(); S.ev = 0; report([{q:"events",v:S.events.slice()}]); }
-  if(screen==="s6"){ const e=evaluate(); report([{q:"end",v:{e:e.ending,eff:e.eff,sat:e.sat,cost:e.cost,risk:e.risk}}]); }
+  S.screen = screen; S.decided = false; S.newCards = [];
+  if(screen==="s3a"){ S.quizIds = QUIZ_ORDER.filter(reqAvail).slice(0,3); }
+  if(screen==="s4"){ S.events = buildEvents(); S.ev = 0; report([{q:"events",v:S.events.slice()}]); }
+  if(screen==="s5"){ const e=evaluate(); report([{q:"end",v:{e:e.ending,eff:e.eff,sat:e.sat,cost:e.cost,risk:e.risk}}]); }
   entrySnap = JSON.stringify(S);
   render(); window.scrollTo(0,0);
 }
@@ -275,230 +591,364 @@ function back(){
   render(); window.scrollTo(0,0);
 }
 
-// ============ 計算 ============
-const mustHas = r => S.musts.includes(r);
-const isIT = () => S.sol==="app" || S.sol==="visual";
-function solCost(k){
-  let c = SOL[k].cost;
-  if(k==="visual" && S.tech.includes("benchmark")) c -= 20;
-  return c;
-}
-const baseCost = () => solCost(S.sol);
-
+// ============ できごと ============
 function buildEvents(){
-  const ev = [];
-  if(baseCost()>BUDGET && !mustHas("r6")) ev.push("budget");
-  if(isIT() && !S.sh.includes("manager")) ev.push("coop");
-  if(isIT() && !S.sh.includes("jyoshi") && !mustHas("r5")) ev.push("privacy");
-  if(S.sol==="app" && !S.sh.includes("minority") && !mustHas("r3")) ev.push("intl");
-  if(S.sol==="app" && !S.sh.includes("staff") && !S.tech.includes("observe")) ev.push("kitchen");
-  if(S.sol==="kc") ev.push("kcprofit");
-  if(S.sol==="shift") ev.push("slow");
-  ev.push("scope");
-  return ev;
+  // 起きるできごとは、選んだ部品で決まる。聞いていない相手のものを先に出し、聞いていたものは後ろに回す
+  const top=[], miss=[], ok=[];
+  const add=(k,cond,asked)=>{ if(cond) (asked?ok:miss).push(k); };
+  if(totalCost()>BUDGET && !mustHas("g2")) top.push("budget");
+  if(hasPart("seats") && !hasFact("facility")) top.push("seats");
+  add("coop", itPart() && !mustAny(["r_coop"]), hasFact("coop"));
+  add("privacy", itPart() && !mustAny(["g3","r_sec"]), hasFact("privacy"));
+  add("intl", hasPart("app") && !mustAny(["r_noph","r_lang"]), hasFact("intl"));
+  add("kitchen", hasPart("app") && !hasPart("ret") && !hasPart("menu") && !mustAny(["r_kit"]), hasFact("kitchen"));
+  add("kcprofit", hasPart("kc"), hasFact("coop"));
+  add("slow", hasPart("shift") && !hasPart("visual"), true);
+  const all=top.concat(miss,ok);
+  S.extraEv = all.slice(3);
+  return all.slice(0,3).concat(["scope"]);
 }
-
+const itName = ()=> itPart()? PARTS[itPart()].s : "";
+const lblFact = fs => infoCards().filter(k=>k.f.some(f=>fs.includes(f))).map(k=>k.label).slice(0,3).join("、");
+const lblWho = w => infoCards().filter(k=>k.who===w).map(k=>k.label).join("、");
+// どのできごとも、選択肢はすべて現実的な判断。根拠になるカードを持っていれば通り、なければ通らない
 const EVENTS = {
   budget:{
-    title:"「この見積もりでは予算を通せません」", who:"大学の財務課",
-    text:()=>`初年度の見積もり（${baseCost()}万円）が、学生課の予算（${BUDGET}万円）を超えていたため、差し戻されました。`,
+    title:"「この見積もりでは予算を通せません」", who:"大学の財務課", aff:["g2","r_fund"],
+    text:()=>`初年度の見積もり（${totalCost()}万円）が、学生課の予算（${BUDGET}万円）を超えていたため、差し戻されました。`,
     opts:()=>{
-      const o=[
-        {id:"cut",t:"機能を削って予算内に収める",d:"Mustにした要求を優先して残す",fx:{eff:-10,costSet:BUDGET}},
-        {id:"phase",t:"一部の時間帯・メニューだけで試験導入する",d:"本格導入は来年度に判断",fx:{eff:-15,costSet:110,sat:-5}},
-        {id:"force",t:"効果が大きいので、このまま認めてもらうよう押し通す",d:"予算は後から何とかなるはず",fx:{flag:"cancel"}}
+      const okRaise=hasFact("stats")||hasFact("bench")||hasFact("peak"), okSplit=hasWho("zaimu");
+      return [
+        {id:"cut",t:"機能を削って予算内に収める",d:"Mustにした要求を優先して残す",fx:{eff:-10,costSet:BUDGET},st:"変更して承認"},
+        {id:"trial",t:"一部の時間帯だけ先に試験導入する",d:"本格導入は来年度に判断する。最初の効果は小さい",fx:{eff:-15,costSet:110,sat:-5},st:"変更して承認"},
+        {id:"split",t:"費用を2年度に分けて計上できないか、財務課に相談する",d:"初年度の費用を予算内に収める",basis:lblWho("zaimu"),fx:okSplit?{costSet:BUDGET,sat:3}:{costSet:BUDGET,sat:-8,eff:-3},st:"変更して承認"},
+        {id:"raise",t:"効果の見込みを示して、予算の追加を申請する",d:"見積もりのまま通すことを目指す",basis:lblFact(["stats","peak","bench"]),fx:okRaise?{raise:true,sat:2}:{flag:"cancel"},st:okRaise?"承認":"却下"}
       ];
-      if(S.tech.includes("workshop")) o.splice(2,0,{id:"ws",t:"ワークショップの参加者と優先順位を見直す",d:"合意した目的（ピークの30分）に効く機能だけに絞る",fx:{eff:-5,costSet:BUDGET,sat:5},ws:true});
-      return o;
     },
-    fb:{cut:["warn","予算内に収まりましたが、効果は下がりました。どの要求を削るかは、目的につながっているか（トレーサビリティ）で判断します。"],
-        phase:["warn","試験導入は現実的な判断です。ただし最初の効果は小さくなります。"],
-        ws:["good","事前に目的を合意していたので、何を削るかをすぐ決められました。ワークショップの効果です。"],
-        force:["bad","予算を超えた計画は承認されず、プロジェクトは止まりました。予算という制約も、大事な要求です。"]}
+    fb:{cut:["warn","予算内に収まりましたが、効果は下がりました。どの要求を削るかは、目的につながっているか（トレース）で判断します。"],
+        trial:["warn","試験導入は現実的な判断です。ただし最初の効果は小さくなります。"],
+        split:()=>hasWho("zaimu")
+          ? ["good","聞いていた「2年度に分けて計上できる」という条件を、そのまま使えました。聞き取りで得た情報が、変更への対応を楽にしています。"]
+          : ["warn","相談は通りましたが、財務課の条件を一から確かめることになり、調整に時間がかかりました。関係者の期待は少し下がりました。"],
+        raise:()=>(hasFact("stats")||hasFact("bench")||hasFact("peak"))
+          ? ["good","手持ちの数字（または他大学の事例）を示して、追加の申請が認められました。集めた情報が、説得の材料になりました。"]
+          : ["bad","申請は「効果の根拠が見えない」と差し戻されました。根拠になる数字や事例がないまま追加を求めると、お金をめぐる調整が長引きます。"]}
   },
   coop:{
-    title:"「月額や手数料は、誰が払うんですか？」", who:"生協の店長",
-    text:()=>`生協は大学とは別の組織で、独立採算です。「${SOL[S.sol].t}」の月額費用${S.sol==="app"?"や決済手数料（売上の約3%）":""}を生協が払い続けるのは難しい、と言われました。`,
-    opts:()=>[
-      {id:"subsidy",t:"大学が3年間、運用費を補助する",d:"学生課の予算から出す（費用＋40万円）",fx:{cost:40}},
-      {id:"cheap",t:"機能を絞った安いプランに変える",d:"月額を下げるかわりに、できることが減る",fx:{eff:-10}},
-      {id:"push",t:"運用は生協の仕事なので、生協に払ってもらう",d:"大学は導入費だけ出す",fx:{flag:"cancel"}}
-    ],
+    title:"「月額や手数料は、誰が払うんですか？」", who:"生協の店長", aff:["r_coop","r_sales"],
+    text:()=>`生協は大学とは別の組織で、独立採算です。「${itName()}」の月額費用${hasPart("app")?"や決済手数料（売上の約3%）":""}を生協が払い続けるのは難しい、と言われました。`,
+    opts:()=>{
+      const ok=hasFact("coop");
+      return [
+        {id:"subsidy",t:"大学が3年間、運用費を補助する",d:"学生課の予算から出す（費用＋40万円）",fx:{cost:40},st:"変更して承認"},
+        {id:"cheap",t:"機能を絞った安いプランに変える",d:"月額を下げるかわりに、できることが減る",fx:{eff:-10},st:"変更して承認"},
+        {id:"ask",t:"生協に、売上の増える見込みを示して、運用費の負担をお願いする",d:"費用を分け合う形を目指す",basis:lblFact(["coop","profit"]),fx:ok?{cost:20,sat:3}:{flag:"cancel"},st:ok?"変更して承認":"却下"}
+      ];
+    },
     fb:{subsidy:["warn","続けられる形になりましたが、大学の費用は増えました。お金を出す人・運用する人を最初に巻き込んでいれば、計画の段階で決められました。"],
         cheap:["warn","続けられる形にはなりましたが、効果は下がりました。"],
-        push:["bad","生協が導入を断り、計画は止まりました。運用する人の事情は、最初に聞くべき要求です。"]}
+        ask:()=>hasFact("coop")
+          ? ["good","店長から聞いていた「経営の事情」と「ピーク以外にも来てほしい」という本音に合わせて話せたので、運用費を一部負担してもらえました。"]
+          : ["bad","店長は「売上が増える根拠が分からない」と難色を示し、調整が長引きました。運用する人の事情は、最初に聞くべき要求です。"]}
   },
   privacy:{
-    title:"「セキュリティ審査を通していませんよね？」", who:"情報センター",
-    text:()=> S.sol==="visual"
+    title:"「セキュリティ審査を通していませんよね？」", who:"情報センター", aff:["g3","r_sec"],
+    text:()=> itPart()==="visual"
       ? "人数を数えるためにカメラを付ける計画を知った学生から「監視されるのでは」という声が上がり、情報センターから待ったがかかりました。"
       : "注文サービスが学籍番号や購買履歴を外部のクラウドに送ることがわかり、情報センターから「セキュリティ審査を通していない」と待ったがかかりました。",
-    opts:()=>[
-      {id:"reduce",t:"扱う情報を減らす方式に変える",d:S.sol==="visual"?"映像を保存しないカメラやBluetoothセンサーに変える":"学籍番号を使わず、注文番号だけで受け取れるようにする",fx:{eff:-5}},
-      {id:"review",t:"セキュリティ審査を正式に受ける",d:"公開は2か月遅れる",fx:{sat:-10,eff:-5}},
-      {id:"ignore",t:"問題ないと判断して、そのまま始める",d:"時間がもったいない",fx:{flag:"scandal"}}
-    ],
-    fb:{reduce:["good","必要な情報だけを扱う設計に変えました。非機能要求（安全性・プライバシー）を後から足すと手戻りになります。最初に情報センターに聞いていれば防げました。"],
+    opts:()=>{
+      const ok=hasFact("privacy");
+      return [
+        {id:"reduce",t:"扱う情報を減らす方式に変える",d:itPart()==="visual"?"映像を保存しないカメラやBluetoothセンサーに変える":"学籍番号を使わず、注文番号だけで受け取れるようにする",fx:{eff:-5},st:"変更して承認"},
+        {id:"review",t:"セキュリティ審査を正式に受ける",d:"公開は2か月遅れる",fx:{sat:-10,eff:-5},st:"変更して承認"},
+        {id:"parallel",t:"公開を優先し、審査は並行して進める",d:"公開の遅れを避ける",basis:lblFact(["privacy"]),fx:ok?{sat:-2,risk:5}:{flag:"scandal"},st:ok?"変更して承認":"却下"}
+      ];
+    },
+    fb:{reduce:["good","必要な情報だけを扱う設計に変えました。安全性やプライバシーの要求は、後から足すと手戻りになります。"],
         review:["warn","ルールは守れましたが、公開が遅れて学生の期待は下がりました。"],
-        ignore:["bad","始めた直後にSNSで「学食に監視される」と話題になり、大問題に……。"]}
+        parallel:()=>hasFact("privacy")
+          ? ["good","情報センターに事前に相談していたので、審査を並行して進めることが認められました。ただし、審査が終わるまでは小さなリスクが残ります。"]
+          : ["bad","始めた直後にSNSで「学食に監視される」と話題になり、大問題に……。審査の条件を確かめないまま公開を優先したことが、問題を広げました。"]}
   },
   intl:{
-    title:"「アプリの登録ができません」", who:"留学生",
+    title:"「アプリの登録ができません」", who:"留学生", aff:["r_noph","r_lang"],
     text:()=>"来日したばかりの留学生は日本の電話番号がなく、アプリのSMS認証ができません。事前注文の窓口ばかりが優先され、現金の列はさらに長くなりました。",
-    opts:()=>[
-      {id:"ic",t:"ICカードや現金でも並べる窓口を残す",d:"生協の窓口で個別に登録を手伝う（費用＋10万円）",fx:{cost:10,sat:5}},
-      {id:"kiosk",t:"店頭に多言語のタッチパネル注文機を置く",d:"スマホがなくても事前注文と同じ流れで使える（費用＋60万円）",fx:{cost:60,sat:10,eff:5}},
-      {id:"push",t:"アプリに一本化する方針を変えない",d:"慣れればみんな使うはず",fx:{sat:-25,risk:20}}
-    ],
+    opts:()=>{
+      const ok=hasFact("intl");
+      return [
+        {id:"ic",t:"ICカードや現金でも並べる窓口を残す",d:"生協の窓口で個別に登録を手伝う（費用＋10万円）",fx:{cost:10,sat:5},st:"変更して承認"},
+        {id:"kiosk",t:"店頭に多言語のタッチパネル注文機を置く",d:"スマホがなくても事前注文と同じ流れで使える（費用＋60万円）",fx:{cost:60,sat:10,eff:5},st:"変更して承認"},
+        {id:"unify",t:"アプリに一本化し、困る人には個別に対応する",d:"窓口は増やさず、登録の手伝いだけを用意する",basis:lblFact(["intl"]),fx:ok?{sat:2,risk:3}:{sat:-25,risk:20},st:ok?"変更して承認":"却下"}
+      ];
+    },
     fb:{ic:["warn","最低限の配慮はできました。少数派の関係者を最初に入れておけば、設計の段階で織り込めました。"],
-        kiosk:["good","使える人が増え、効果も上がりました。実際に、スマホとタッチパネルを併用している大学もあります。ただし後から足したぶん、費用は増えています。"],
-        push:["bad","一部の利用者を置き去りにする形になり、大学の評判が下がりました。"]}
+        kiosk:["good","使える人が増え、効果も上がりました。ただし後から足したぶん、費用は増えています。"],
+        unify:()=>hasFact("intl")
+          ? ["good","留学生から聞いていた「登録でつまずく場面」に合わせて、個別対応の手順を用意できていました。窓口を増やさずに済みました。"]
+          : ["bad","個別対応の手順が用意できておらず、困る人が置き去りになりました。大学の評判が下がりました。"]}
   },
   kitchen:{
-    title:"「12:20受け取りの注文が150件も来たら、揚がりません！」", who:"調理・レジのパート",
+    title:"「12:20受け取りの注文が150件も来たら、揚がりません！」", who:"調理・レジのパート", aff:["r_kit","r_train"],
     text:()=>"事前注文が始まると、受取時刻が昼休み開始直後に集中しました。注文は速くなったのに、厨房と受取口の前が大渋滞しています。",
-    opts:()=>[
-      {id:"slot",t:"受取時刻ごとに注文数の上限を設ける",d:"5分ごとに30件まで。人気の時刻はすぐ埋まる",fx:{eff:-5}},
-      {id:"bento",t:"事前注文は弁当・丼など、作り置きできるメニューに限る",d:"揚げ物や麺は対象外にする",fx:{eff:-10,sat:-5}},
-      {id:"none",t:"慣れれば落ち着くので、様子を見る",d:"パートさんに頑張ってもらう",fx:{flag:"overflow"}}
-    ],
+    opts:()=>{
+      const ok=hasFact("kitchen");
+      return [
+        {id:"slot",t:"受取時刻ごとに注文数の上限を設ける",d:"5分ごとに30件まで。人気の時刻はすぐ埋まる",fx:{eff:-5},st:"変更して承認"},
+        {id:"bento",t:"事前注文は弁当・丼など、作り置きできるメニューに限る",d:"揚げ物や麺は対象外にする",fx:{eff:-10,sat:-5},st:"変更して承認"},
+        {id:"all",t:"全メニューで始め、現場の様子を見て調整する",d:"注文の集まり方を見てから、上限や対象を決める",basis:lblFact(["kitchen"]),fx:ok?{risk:3}:{flag:"overflow"},st:ok?"変更して承認":"却下"}
+      ];
+    },
     fb:{slot:["good","注文の集中をならす仕組みを入れました。システムの前後にある「現場の作業」まで含めて考えるのがBAの仕事です。"],
         bento:["warn","混乱は収まりましたが、使えるメニューが減りました。"],
-        none:["bad","受取口の混乱は続き、パートさんが次々と辞めてしまいました……。"]}
+        all:()=>hasFact("kitchen")
+          ? ["good","現場の事情を聞いていたので、どこから詰まるか、いつ上限を入れるかの基準を決めたうえで始められました。"]
+          : ["bad","受取口の混乱が続き、パートさんの負担が増え続けて、辞める人が出ました……。現場の限界が分からないまま始めたことが原因です。"]}
   },
   kcprofit:{
-    title:"「昼の40分しか売れないんじゃ、割に合いません」", who:"キッチンカーの事業者",
+    title:"「昼の40分しか売れないんじゃ、割に合いません」", who:"キッチンカーの事業者", aff:["r_sales"],
     text:()=>"学生の評判は上々です。しかし、売れるのは昼休みの間だけ。出店料とガソリン代を引くと利益がほとんど出ず、事業者が撤退を考えています。",
-    opts:()=>[
-      {id:"free",t:"出店料を無料にし、電源も大学が用意する",d:"大学の費用が少し増える（＋20万円）",fx:{cost:20}},
-      {id:"coop",t:"生協と組んで、弁当ワゴンの販売も一緒に行う",d:S.sh.includes("manager")?"店長とは話ができているので、すぐに調整できる":"生協との調整に時間がかかる",fx:S.sh.includes("manager")?{eff:5,sat:5}:{sat:-5}},
-      {id:"none",t:"事業者の問題なので、何もしない",d:"出店は事業者の判断",fx:{flag:"kcleave"}}
-    ],
+    opts:()=>{
+      const ok=hasFact("coop");
+      return [
+        {id:"free",t:"出店料を無料にし、電源も大学が用意する",d:"大学の費用が少し増える（＋20万円）",fx:{cost:20},st:"変更して承認"},
+        {id:"coop",t:"生協と組んで、弁当ワゴンの販売も一緒に行う",d:"販売の時間と場所を増やす",basis:lblFact(["coop"]),fx:ok?{eff:5,sat:5}:{flag:"kcleave"},st:ok?"変更して承認":"却下"},
+        {id:"leave",t:"事業者の判断に任せ、大学は関与しない",d:"出店は事業者の判断",basis:lblFact(["coop"]),fx:ok?{}:{flag:"kcleave"},st:ok?"維持":"却下"}
+      ];
+    },
     fb:{free:["warn","続けてもらえることになりました。関わる人が続けられる仕組み（採算）も要求の一つです。"],
-        coop:["good","生協と事業者の両方にとって無理のない形になりました。"],
-        none:["bad","半年後、事業者は撤退しました。"]}
+        coop:()=>hasFact("coop")
+          ? ["good","生協の経営の事情を聞いていたので、すぐに調整できました。生協と事業者の両方にとって無理のない形になりました。"]
+          : ["bad","生協との調整に時間がかかり、その間に事業者が撤退しました。"],
+        leave:()=>hasFact("coop")
+          ? ["warn","生協が販売を引き継ぐ意向だったので、事業者が撤退しても、売り場は残りました。ただし、キッチンカーの効果は小さくなりました。"]
+          : ["bad","半年後、事業者は撤退しました。受け皿になる相手が見つからず、分散の効果はなくなりました。"]}
   },
   slow:{
-    title:"「変更は、早くて再来年度からです」", who:"教務課",
+    title:"「変更は、早くて再来年度からです」", who:"教務課", aff:["g1"],
     text:()=>"時間割を変えるには、全学共通の科目や非常勤講師の都合を調整し、教授会の承認を得る必要があります。それまでの1年半、学生は待つしかありません。",
     opts:()=>{
       const o=[];
-      if(S.tech.includes("survey")||has("data")) o.push({id:"data",t:"データを教授会に示し、承認を急いでもらう",d:has("survey")?"アンケートでは45%が「使いたいが時間がない」と回答":"食堂の満足度は学内施設で最下位",fx:{sat:10}});
-      o.push({id:"bridge",t:"それまでのつなぎとして、混雑の見える化を入れる",d:"すぐに効く対策を組み合わせる（＋60万円）",fx:{cost:60,eff:5}});
-      o.push({id:"wait",t:"時間割の変更まで待つ",d:"費用はかからない",fx:{sat:-10}});
+      if(hasFact("stats")||hasFact("peak")) o.push({id:"data",t:"データを教授会に示し、承認を急いでもらう",d:(hasMethod("survey")&&hasWho("student"))?"アンケートでは45%が「使いたいが時間がない」と回答":"来店の7割が12:20〜12:45に集中し、満足度は学内施設で最下位",basis:lblFact(["stats","peak"]),fx:{sat:10},st:"変更して承認"});
+      o.push({id:"bridge",t:"それまでのつなぎとして、混雑の見える化を入れる",d:"すぐに効く対策を組み合わせる（＋60万円）",fx:{cost:60,eff:5},st:"変更して承認"});
+      o.push({id:"wait",t:"時間割の変更まで待つ",d:"費用はかからない",fx:{sat:-10},st:"維持"});
       return o;
     },
-    fb:{data:["good","数字で示したことで、議論が進みました。聞き方（アンケート・データ）が説得力になりました。"],
+    fb:{data:["good","数字で示したことで、議論が進みました。集めた情報が、説得の材料になりました。"],
         bridge:["good","根本的な対策と、すぐに効く対策を組み合わせました。"],
         wait:["warn","費用はかかりませんが、今の学生は1年半、混雑に耐えることになります。"]}
   },
+  seats:{
+    title:"「この配置では、通路幅が基準に足りません」", who:"施設課", aff:["r_fac"],
+    text:()=>"席を増やす工事の段階になって、施設課から「食堂の通路幅は消防法の基準ぎりぎりで、机と椅子はこれ以上置けない」と言われました。",
+    opts:()=>[
+      {id:"shrink",t:"増やす席を、通路幅に収まる範囲（約30席）に減らす",d:"費用は少し下がるが、効果も小さくなる",fx:{eff:-15,cost:-10},st:"変更して承認"},
+      {id:"room",t:"食堂の外の空き教室やラウンジを、食事のスペースとして開放する",d:"管理する部署との調整が要る（＋10万円）",fx:{cost:10,eff:-5,sat:-3},st:"変更して承認"},
+      {id:"exc",t:"基準の例外を申請して、計画どおり増設する",d:"席数は予定どおり増える",fx:{flag:"cancel"},st:"却下"}
+    ],
+    fb:{shrink:["warn","基準に収まる形にしました。席は増えましたが、予定より小さな効果になりました。制約を計画の前に確かめていれば、最初から別の案を選べました。"],
+        room:["warn","食堂の外に席を作りました。管理の調整に手間がかかり、使われ方も様子見になっています。"],
+        exc:["bad","通路幅の基準は大学が決められるものではなく、申請は受け付けられませんでした。設備や法令の制約は、施設課に聞けば分かることでした。"]}
+  },
   scope:{
-    title:"「ついでに、クーポン配信もできませんか？」", who:"生協・学生課",
+    title:"「ついでに、クーポン配信もできませんか？」", who:"生協・学生課", aff:[],
     text:()=>"プロジェクトの途中で、「せっかくだから、クーポンや学内イベントのお知らせも配信したい」と頼まれました（スコープの追加）。",
     opts:()=>[
-      {id:"accept",t:"依頼主の頼みなので受け入れる",d:"費用＋30万円、期間も延びる",fx:{cost:30,risk:5}},
-      {id:"trace",t:"目的（ピークの混雑解消）につながらないので、次の段階に回すことを提案する",d:"要求と目的のつながりを示して説明する",fx:{sat:S.tech.includes("workshop")?5:0}},
-      {id:"reject",t:"理由を言わずに断る",d:"余計な仕事は増やしたくない",fx:{sat:-10}}
+      {id:"accept",t:"依頼を全部受け入れる",d:"費用＋30万円、期間も延びる",fx:{cost:30,risk:5},st:"承認"},
+      {id:"minimum",t:"最小限の機能だけ受け入れる",d:"お知らせの配信だけを加える（＋10万円）",fx:{cost:10,risk:2},st:"一部承認"},
+      {id:"record",t:"今回は受けず、次の段階の課題として記録する",d:"目的（ピークの混雑解消）とのつながりを示して説明する",basis:lblFact(["agree"]),fx:{sat:hasFact("agree")?5:-3},st:"見送り"}
     ],
     fb:{accept:["warn","依頼主は喜びましたが、費用と期間が増えました。目的につながらない要求を受け続けると、プロジェクトは膨らみます。"],
-        trace:["good","この要求が目的につながらないことを示し、納得してもらえました。これがトレーサビリティの使い方です。"],
-        reject:["bad","依頼主との関係が悪くなりました。断るときこそ理由（目的とのつながり）を示します。"]}
+        minimum:["warn","依頼主の希望に一部応えつつ、増える費用を抑えました。目的につながる範囲かどうかは、要求カードの出所で確かめられます。"],
+        record:()=>hasFact("agree")
+          ? ["good","目的を関係者と合意していたので、「この要求は目的につながらない」と説明でき、納得してもらえました。出所と目的をたどれる要求カードがあるから、できる説明です。"]
+          : ["warn","理由を説明しましたが、目的を関係者と合意していなかったので、依頼主の納得は半分でした。合意があれば、断る理由を示しやすくなります。"]}
   }
 };
 
+// ============ 評価 ============
 function evaluate(){
-  const sol = S.sol, goal = S.goal, t = S.tech, sh = S.sh;
-  let eff = EFFECT[sol][goal], cost = baseCost(), sat = 50, risk = 20;
-  const notes = [];
-  if(has("data")) eff+=5;
-  if(sol==="ret" && t.includes("observe")) eff+=10;
-  if(sol==="visual"){ if(t.includes("survey")) eff+=10; if(t.includes("benchmark")) eff+=5; if(t.includes("prototype")) eff+=5; }
-  if(sol==="app"){ if(t.includes("prototype")) eff+=10; if(t.includes("benchmark")) eff+=5; }
-  if(sol==="kc" && sh.includes("student")) eff+=5;
-  if(mustHas("r1")) eff+=5;
-  if(mustHas("r6") && cost>BUDGET){ eff-=10; cost=BUDGET; notes.push(`「初年度の費用を${BUDGET}万円以内」をMustにしていたので、最初から予算内に収まる設計にしました（効果は少し下がります）。`); }
-  if(S.seatTried) sat-=5;
-  if(goal==="sales") sat-=10;
-  if(t.includes("interview")) sat+=10;
-  if(t.includes("workshop")) sat+=10;
-  if(sh.includes("student")) sat+=5;
-  if(sh.includes("minority")) sat+=5;
-  if(mustHas("r7")) sat+=5;
-  const mismatch = (mustHas("r2")&&sol!=="app")||(mustHas("r4")&&sol!=="visual");
-  if(mismatch) sat-=5;
-  if(sol==="app" && !t.includes("prototype")) risk+=15;
-  if(isIT() && !sh.includes("jyoshi")) risk+=10;
-  if(sol==="shift" && !sh.includes("kyomu")) risk+=10;
-  if(sol==="kc") risk+=10;
+  const goal=S.goal, c=S.center, P=S.parts, aux=P.filter(k=>k!==c);
+  let eff=EFFECT[c][goal], cost=totalCost(), sat=50, risk=20, limit=BUDGET, raised=false;
+  const notes=[];
+  if(S.first==="data") eff+=4;
+  if(S.first==="floor"){ sat+=2; if(c==="ret") eff+=5; }
+  if(S.first==="boss"){ sat+=4; risk-=3; }
+  if(c==="ret" && hasMethod("observe")) eff+=10;
+  if(c==="visual"){ if(hasMethod("survey")) eff+=10; if(hasMethod("benchmark")) eff+=5; if(hasMethod("prototype")) eff+=5; }
+  if(c==="app"){ if(hasMethod("prototype")) eff+=10; if(hasMethod("benchmark")) eff+=5; }
+  if(c==="kc" && hasWho("student")) eff+=5;
+  if(c==="cashier"){ if(hasFact("bottle")) eff+=8; else risk+=8; }
+  if(c==="seats" && hasFact("facility")) eff-=15;
+  if(hasPart("menu") && !hasFact("kitchen")) sat-=3;
+  aux.forEach(k=>{ eff+=AUX[k][goal]; });
+  synergies().forEach(s=>{ eff+=s.eff||0; sat+=s.sat||0; risk+=s.risk||0; });
+  if(mustHas("g1")) eff+=5;
+  if(mustHas("g2") && cost>BUDGET){ eff-=10; cost=BUDGET; notes.push(`「初年度の費用を${BUDGET}万円以内」をMustにしていたので、最初から予算内に収まる設計にしました（効果は少し下がります）。`); }
+  const whos=new Set(S.iv.filter(k=>k!=="bench").map(k=>k.split(".")[0]));
+  sat+=Math.min(15,3*whos.size);
+  if(hasMethod("workshop")) sat+=8;
+  if(hasMethod("interview")&&hasWho("student")) sat+=3;
+  if(mustHas("r_noph")) sat+=5;
+  const unsorted=S.musts.filter(r=>tidy(r));
+  if(unsorted.length){ sat-=2*unsorted.length; notes.push("種類の整理が済んでいない要求をMustにしたため、組み合わせが満たすかどうかを判定できませんでした："+unsorted.map(r=>REQS[r].t).join("、")+"。"); }
+  const miss=S.musts.filter(r=>r!=="g2" && !tidy(r) && fitOf(r)==="✕");
+  if(miss.length){ sat-=4*miss.length; notes.push("Mustにした要求のうち、今の組み合わせでは満たされないものがあります："+miss.map(r=>REQS[r].t).join("、")+"。"); }
+  if(c==="app" && !hasFact("userfit") && !hasPart("pilot")) risk+=15;
+  if(itPart() && !hasWho("jyoshi")) risk+=10;
+  if(hasPart("kc")) risk+=10;
+  if(hasPart("pilot")) risk-=15;
+  if(S.wk==="ask") sat+=3;
+  if(S.wk==="cond") risk-=5;
+  if(S.wk==="scope"){ risk-=5; eff-=3; }
+  if(S.wk==="none") risk+=5;
 
-  let flag = null;
+  let flag=null, cancels=0;
   S.events.forEach(e=>{
-    const choice = S.evChoice[e]; if(!choice) return;
-    const o = EVENTS[e].opts().find(x=>x.id===choice); if(!o) return;
-    const f = o.fx;
-    if(f.flag) flag = flag || f.flag;
+    const ch=S.evChoice[e]; if(!ch) return;
+    const o=EVENTS[e].opts().find(z=>z.id===ch); if(!o) return;
+    const f=o.fx;
+    if(f.flag==='cancel') cancels++; else if(f.flag) flag=flag||f.flag;
+    if(f.raise) raised=true;
     if(f.eff) eff+=f.eff; if(f.sat) sat+=f.sat; if(f.risk) risk+=f.risk;
-    if(f.costSet!==undefined) cost = f.costSet;
+    if(f.costSet!==undefined) cost=f.costSet;
     if(f.cost) cost+=f.cost;
   });
 
-  let ending;
-  const appSafe = t.includes("prototype")||t.includes("survey")||t.includes("benchmark")||(sh.includes("student")&&t.includes("interview"));
-  if(flag==="cancel"){ ending="cancel"; eff=0; cost=Math.min(cost,30); sat=Math.min(sat,25); risk=Math.max(risk,70); }
-  else if(flag==="scandal"){ ending="scandal"; sat-=30; risk=90; eff=Math.min(eff,20); }
-  else if(flag==="overflow"){ ending="overflow"; eff=Math.min(eff,15); sat-=20; risk+=20; }
-  else if(flag==="kcleave"){ ending="kcleave"; eff=Math.min(eff,10); sat-=10; }
-  else if(sol==="app" && !appSafe){ ending="unused"; eff=Math.min(eff,20); sat-=10; }
-  else ending = sol;
-  if(cost>BUDGET && ending!=="cancel"){ risk+=10; notes.push(`最終的な費用が予算（${BUDGET}万円）を超えています。`); }
-  const c = v=>Math.max(0,Math.min(100,Math.round(v)));
-  return {eff:c(eff),sat:c(sat),risk:c(risk),cost,ending,notes,mismatch};
+  let ending=c;
+  const pen=(why)=>{ eff-=15; sat-=15; risk+=15; notes.push(why); };
+  if(cancels===1){ eff-=10; sat-=25; risk+=20; notes.push("お金や運用の事情を後回しにした判断で調整が長引き、関係者の信頼が下がりました。"); }
+  if(cancels>=2){ ending="cancel"; eff=0; cost=Math.min(cost,30); sat=Math.min(sat,25); risk=Math.max(risk,70); }
+  else if(flag==="scandal" && (c==="app"||c==="visual")){ ending="scandal"; sat-=30; risk=90; eff=Math.min(eff,20); }
+  else if(flag==="overflow" && c==="app"){ ending="overflow"; eff=Math.min(eff,15); sat-=20; risk+=20; }
+  else if(flag==="kcleave" && c==="kc"){ ending="kcleave"; eff=Math.min(eff,10); sat-=10; }
+  else if(flag==="scandal") pen("補助にした部品のプライバシーの問題で、評判が下がりました。");
+  else if(flag==="overflow") pen("補助にした部品の注文が集中し、現場に負担がかかりました。");
+  else if(flag==="kcleave") pen("補助にしたキッチンカーが撤退し、分散の効果がなくなりました。");
+  else if(c==="app" && !hasFact("userfit") && !hasPart("pilot")){ ending="unused"; eff=Math.min(eff,20); sat-=10; }
+  if(raised){ limit=Math.max(BUDGET,cost); if(cost>BUDGET) notes.push(`予算の追加（合計${cost}万円）が認められました。`); }
+  if(cost>limit && ending!=="cancel"){ risk+=10; notes.push(`最終的な費用が予算（${BUDGET}万円）を超えています。`); }
+  const cl=v=>Math.max(0,Math.min(100,Math.round(v)));
+  return {eff:cl(eff),sat:cl(sat),risk:cl(risk),cost,ending,notes};
 }
 
+// 結末は成功・失敗ではなく、起きたことの説明にする。どの結末にも「うまくいった点」と「残った課題」を書く
 const ENDINGS = {
-  ret:{tag:"結末：現場の知恵",t:"返却口と「食後の席」の対策で、低コストのまま席が回るように",story:"席が空かない原因は、返却口の列と、食べ終わった後も席に残る人でした。返却口を増やし、食後に使える空き教室を案内すると、席の回転が上がって行列も短くなりました。「システムを作らなくても解決できた」と学生課長も驚いています。"},
-  shift:{tag:"結末：根本解決",t:"時間割を見直し、昼休みそのものを延ばした（効果は再来年度から）",story:"昼休みが延びて、来店が自然に分散しました。システムはひとつも作っていません。実際に、昼休みが短すぎるとして授業時間を元に戻した大学もあります。原因に手を打てば、IT以外の解決策が一番効くこともあります。"},
-  visual:{tag:"結末：堅実な改善",t:"混雑の見える化で来店が分散し、そこそこ改善",story:"「今は混んでいる」とスマホでわかるだけで、時間をずらす学生が増えました。劇的ではありませんが、費用に対して手堅い効果が出ました。"},
-  app:{tag:"結末：DX成功",t:"モバイルオーダーが定着し、ピークの行列が短くなった",story:"利用者の声や他大学の事例をふまえて設計したので、事前注文が定着しました。注文と会計の列はほぼなくなりました。残る課題は、運用費を誰がどう払い続けるかです。"},
-  kc:{tag:"結末：分散作戦",t:"キッチンカーと弁当ワゴンで、食堂への集中がやわらいだ",story:"講義棟の前で買えるようになり、食堂に来る人が分散しました。関係者が続けられる形を整えたことで、定番の風景になりつつあります。"},
-  unused:{tag:"結末：よくある失敗",t:"モバイルオーダーを入れたが、あまり使われなかった",story:"アプリは動きましたが、利用は伸びませんでした。学生が本当に困っていたのは「席が空かないこと」で、注文の手間ではなかったのです。作る前に利用者の声を確かめていれば……。"},
-  overflow:{tag:"結末：現場がパンク",t:"注文は速くなったが、厨房と受取口が大渋滞",story:"注文の入口だけをデジタル化しても、厨房の調理能力は増えていません。受取口に学生があふれ、パートさんの負担が限界を超えました。システムの前後にある業務まで見るのがBAの仕事です。"},
-  kcleave:{tag:"結末：半年で元どおり",t:"キッチンカーが撤退し、混雑が戻ってきた",story:"始めは好評でしたが、事業者の採算が合わず撤退しました。関わる人が続けられるかどうかも、要求として考える必要がありました。"},
-  scandal:{tag:"結末：炎上",t:"プライバシーの問題で評判が下がり、利用が止まった",story:"始めた直後にSNSで話題になり、大学が利用停止を決めました。後から直すのは、最初に考えるより何倍も大変です。"},
-  cancel:{tag:"結末：途中で中止",t:"お金の問題で、プロジェクトは止まった",story:"誰がいくら払うのかを決めないまま進めた結果、計画は承認されませんでした。お金を出す人・運用する人の事情も、大事な要求です。"}
+  ret:{tag:"結末：返却口と席の使い方を見直した",t:"返却口と「食後の席」の対策で、席が回るようになった",
+    story:"席が空かない原因は、返却口の列と、食べ終わった後も席に残る人でした。返却口を増やし、食後に使える空き教室を案内すると、席の回転が上がって行列も短くなりました。",
+    good:"システムを作らずに、低い費用で席の回転が上がりました。現場で起きていることを見て、原因に手を打った形です。",
+    issue:"食後に席を離れてもらう仕組みは、案内が定着するまで声かけが要ります。注文や会計の手間は変わっていません。"},
+  shift:{tag:"結末：昼休みそのものを延ばした",t:"時間割を見直し、昼休みを延ばした（1年後は途中、2年後に大きく効く見込み）",
+    story:"昼休みが延びて、来店が少しずつ分散しました。1年後の時点では、承認と調整が終わったばかりで、効果は途中です。2年後には来店の集中がさらにやわらぐ見込みです。実際に、昼休みが短すぎるとして授業時間を元に戻した大学もあります。",
+    good:"原因（昼休みの短さ）に直接手を打ち、システムの費用や運用をかけずに済みました。",
+    issue:"効果が大きく出るのは再来年度以降です。それまでの間の混雑には、別の手当てが要ります。"},
+  visual:{tag:"結末：混雑の見える化で、来店が少し分散した",t:"混雑の見える化で、時間をずらす学生が増えた",
+    story:"「今は混んでいる」とスマホで分かるだけで、時間をずらす学生が増えました。劇的ではありませんが、費用に対して手堅い効果が出ました。",
+    good:"費用が小さく、試しやすい対策でした。人数を数える方式なので、プライバシーの扱いも整理できます。",
+    issue:"時間をずらせない学生（授業の都合など）は変わりません。待ち時間を大きく減らす対策ではありません。"},
+  app:{tag:"結末：モバイルオーダーが定着した",t:"モバイルオーダーが定着し、注文と会計の列が短くなった",
+    story:"利用者の声や他大学の事例をふまえて設計したので、事前注文が定着しました。注文と会計の列はほぼなくなりました。",
+    good:"利用者の使い方に合わせて設計し、ピークの行列が短くなりました。",
+    issue:"運用費を誰がどう払い続けるか、スマホを使えない人への対応、受取口の混み方は、運用しながら見ていく必要があります。"},
+  kc:{tag:"結末：キッチンカーで食堂への集中がやわらいだ",t:"キッチンカーと弁当ワゴンで、食堂への集中がやわらいだ",
+    story:"講義棟の前で買えるようになり、食堂に来る人が分散しました。関係者が続けられる形を整えたことで、定番の風景になりつつあります。",
+    good:"低い費用で、すぐに混雑がやわらぎました。",
+    issue:"事業者の採算、天候、置き場所に左右されます。席が空かない問題は、そのまま残っています。"},
+  cashier:{tag:"結末：会計の列が短くなった",t:"セルフレジを置き、会計の列が短くなった",
+    story:"セルフレジで会計の列が分かれ、レジ前の待ち時間が短くなりました。",
+    good:"会計の待ち時間という分かりやすい部分に手を打ち、効果が見えやすい形になりました。",
+    issue:"注文や調理、返却口の列には手が付いていません。席が空かない問題も残ります。"+"（現場でキャッシュレス会計の遅れを観察していれば、置く台数や場所をもっと絞れました。）"},
+  seats:{tag:"結末：席は増えたが、行列は残った",t:"席を増やし、座れる人は増えたが、行列は残った",
+    story:"通路幅に収まる範囲で席を増やし、座れない人は減りました。一方で、レジと返却口の列は変わっていません。",
+    good:"席が足りないという声に、分かりやすい形で応えました。",
+    issue:"席が空かない原因が「数」ではなく「回転」だった場合は、効果が限られます。行列の問題は残っています。"},
+  unused:{tag:"結末：導入したが、利用が広がらなかった",t:"モバイルオーダーを入れたが、あまり使われなかった",
+    story:"アプリは動きましたが、利用は伸びませんでした。学生が本当に困っていたのは「席が空かないこと」で、注文の手間ではなかったのです。",
+    good:"システムは予定どおり動き、導入の手順は整いました。",
+    issue:"利用者の困りごとと、解決策が合っていませんでした。作る前に利用者の声を確かめていれば、別の選択もありえました。"},
+  overflow:{tag:"結末：注文は速くなったが、現場に負担が集中した",t:"注文は速くなったが、厨房と受取口に負担が集中した",
+    story:"注文の入口だけをデジタル化しても、厨房の調理能力は増えていません。受取口に学生があふれ、パートさんの負担が限界を超えました。",
+    good:"注文を受ける速さは上がりました。",
+    issue:"システムの前後にある業務（調理・受取）まで見ていませんでした。現場の負担を減らす見直しが要ります。"},
+  kcleave:{tag:"結末：キッチンカーが半年で撤退した",t:"キッチンカーが撤退し、混雑が戻ってきた",
+    story:"始めは好評でしたが、事業者の採算が合わず撤退しました。",
+    good:"半年の間は、食堂への集中がやわらぎ、学生の評判もよかったです。",
+    issue:"関わる人が続けられるかどうかも、要求として考える必要がありました。"},
+  scandal:{tag:"結末：プライバシーへの懸念が広がり、利用を止めた",t:"プライバシーの問題で評判が下がり、利用が止まった",
+    story:"始めた直後にSNSで話題になり、大学が利用停止を決めました。",
+    good:"技術的には動いており、混雑の改善の方向性は間違っていませんでした。",
+    issue:"後から直すのは、最初に考えるより何倍も大変です。審査や規則の条件を、計画の段階で確かめる必要がありました。"},
+  cancel:{tag:"結末：お金と運用の調整がつかず、計画が止まった",t:"お金と運用の問題が重なり、プロジェクトは止まった",
+    story:"予算や運用の事情を後回しにする判断が重なり、計画は承認されませんでした。",
+    good:"ここまでの整理（問題の定義、要求、聞き取りの記録）は残っており、次の計画に使えます。",
+    issue:"お金を出す人・運用する人の事情は、大事な要求です。根拠のないまま進めると、調整が止まります。"}
 };
 
 function hints(){
-  const h=[], t=S.tech, sh=S.sh;
-  if(S.sol!=="ret" && !sh.includes("staff") && !t.includes("observe")) h.push("現場を観察するかパートさんに聞いていたら、席が空かない本当の理由（返却口・食後の居残り）に気づけたかもしれません。");
-  if(S.sol!=="shift" && !sh.includes("kyomu")) h.push("教務課に聞いていたら、システムを作らない解決策（昼休みの延長）が見つかったかもしれません。");
-  if(isIT() && !sh.includes("manager")) h.push("生協の店長に聞いていたら、運用費を誰が払うかを最初に決められました。");
-  if(S.sol==="app" && !t.includes("prototype")) h.push("画面の試作（プロトタイピング）を見せていれば、使いにくさを作る前に発見できました。");
-  if(isIT() && !sh.includes("jyoshi")) h.push("情報センターを最初に巻き込んでいれば、プライバシーの問題は設計の段階で防げました。");
-  if(S.goal==="sales") h.push("問題を「売上」と捉えると、利用者の困りごとが置き去りになりがちです。誰にとっての価値かを考えてみましょう。");
-  if(!t.includes("workshop")) h.push("ワークショップで目的を合意していれば、途中の変更への対応がもっと楽になりました。");
-  return h.slice(0,2);
+  const h=[], c=S.center;
+  if(c!=="ret" && !hasWho("staff") && !hasMethod("observe") && S.first!=="floor") h.push("現場を観察するか、パートさんに聞いていたら、席が空かない本当の理由（返却口・食後の居残り）に気づけたかもしれません。");
+  if(c!=="shift" && !hasWho("kyomu")) h.push("教務課に聞いていたら、システムを作らない解決策（昼休みの延長）が見つかったかもしれません。");
+  if(!hasWho("shisetsu") && !hasPart("layout")) h.push("施設課に聞くか食堂を実測していたら、席を増やすときの通路幅の基準と、席の配置を変える案が見つかりました。");
+  if(itPart() && !hasWho("manager")) h.push("生協の店長に聞いていたら、運用費を誰が払うかを最初に決められました。");
+  if(c==="app" && !hasMethod("prototype")) h.push("画面の試作（プロトタイピング）を見せていれば、使いにくさを作る前に発見できました。");
+  if(itPart() && !hasWho("jyoshi")) h.push("情報センターを最初に巻き込んでいれば、プライバシーの問題は設計の段階で防げました。");
+  if(totalCost()>BUDGET && !hasWho("zaimu")) h.push("財務課に聞いていたら、費用を2年度に分けて計上できることが分かりました。");
+  if(S.goal==="sales") h.push("問題を「売上」と捉えると、利用者の困りごとの声が軽くなりがちです。誰にとっての価値かを考えてみましょう。");
+  if(!hasMethod("workshop")) h.push("ワークショップで目的を合意していれば、途中の変更への対応がもっと楽になりました。");
+  return h.slice(0,3);
 }
 
 // ============ 描画 ============
 const $ = s=>document.querySelector(s);
-const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function ka(k){ return `<div class="ka"><b>この場面の知識エリア：${KA[k].name}</b>${KA[k].text}</div>`; }
-function cardHtml(id){ const c=CARDS[id]; return `<div class="newcard"><b>🗂 ${esc(c.from)}</b>${esc(c.text)}</div>`; }
-function newCardsHtml(){ return S.newCards.length ? `<h3>新しい発見カード</h3>`+S.newCards.map(cardHtml).join("") : ""; }
-function nav(nextLabel, nextFn, canNext){
-  return `<div class="actions">${history.length?`<button class="btn ghost" data-act="back">ひとつ前に戻る</button>`:""}<button class="btn" data-act="${nextFn}" ${canNext?"":"disabled"}>${nextLabel}</button></div>`;
+const esc = s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const opt = (act,sel,t,d,dis)=>`<button class="opt ${sel?"sel":""}" data-act="${act}" ${dis?"disabled":""}><span class="t">${t}</span>${d?`<span class="d">${d}</span>`:""}</button>`;
+const chip = (act,sel,t,dis,cls="")=>`<button class="chip ${cls} ${sel?"sel":""}" data-act="${act}" ${dis?"disabled":""}>${t}</button>`;
+const qh = (n,t,sub)=>`<div class="qh"><span class="qn">Q${n}</span>${t}</div>${sub?`<p class="muted">${sub}</p>`:""}`;
+const blockNow = ()=> S.screen==="s5" ? 7 : (BLOCK[S.screen]||0);
+const lit = id => LIT[id] <= blockNow();
+function kaBoxes(){
+  const m=SCR[S.screen];
+  const par=m.p.filter(lit);
+  return m.c.map(k=>`<div class="ka"><b>この場面の中心になる知識エリア：${KA[k].name}</b>${KA[k].text}</div>`).join("")
+    + (par.length?`<p class="muted">並行して行う：${par.map(k=>KA[k].name).join("、")}</p>`:"");
+}
+function infoCardHtml(k){
+  return `<div class="newcard"><b>🗂 情報カード｜${esc(k.label)}</b>${esc(k.text)}<span class="meta">${k.n?`人数：${esc(k.n)}`:""}${k.dep?`　深さ：${esc(k.dep)}`:""}</span></div>`;
+}
+const cardHtml = key => infoCardHtml(cardOf(key));
+const newCardsHtml = ()=> S.newCards.length ? `<h3>新しく手持ちに入った情報カード</h3>`+S.newCards.map(cardHtml).join("") : "";
+function reqCardHtml(id,pri){
+  const chg=S.chg.filter(z=>z.req===id).map(z=>`${z.st}（${z.ev}）`).join(" → ");
+  return `<div class="reqcard"><b>📋 要求カード｜${tidy(id)?"種類：要整理":RT[REQS[id].ty]}${pri?`｜優先順位：${pri}`:""}</b>${esc(REQS[id].t)}<span class="meta">${esc(reqSource(id))}${chg?`<br>変更履歴：${esc(chg)}`:""}</span></div>`;
+}
+function reqCards(){
+  const cs=[];
+  S.musts.forEach(r=>cs.push(reqCardHtml(r,"Must")));
+  if(S.wont && S.wont!=="none") cs.push(reqCardHtml(S.wont,"Won't（今回はやらない）"));
+  S.chg.filter(z=>z.req==="new").forEach(z=>cs.push(`<div class="reqcard"><b>📋 要求カード｜追加の要求</b>クーポン配信・学内イベントのお知らせ<span class="meta">出所：生協・学生課からの依頼　状態：${esc(z.st)}</span></div>`));
+  return cs;
+}
+function nav(nextLabel, nextAct, canNext){
+  const [k,x]=nextAct.split(":"), g = k==="to" && gated(x);
+  return `<div class="actions">${history.length?`<button class="btn ghost" data-act="back">ひとつ前に戻る</button>`:""}<button class="btn" data-act="${nextAct}" ${canNext&&!g?"":"disabled"}>${g?"合図を待っています…":nextLabel}</button></div>`;
 }
 
-function renderChrome(){
-  const n = STAGE_NO[S.screen];
-  $("#stageLabel").textContent = n ? `Stage ${n} / 6` : "はじめに";
-  $("#prog").style.width = (n/6*100)+"%";
-  $("#baccm").innerHTML = BACCM.map((b,i)=>`<span class="${BACCM_ON[S.screen].includes(i)?"on":""}">${b}</span>`).join("");
-  $("#drawer").classList.toggle("hide", S.cards.length===0);
-  $("#cardCount").textContent = S.cards.length;
-  $("#cardList").innerHTML = S.cards.map(cardHtml).join("");
+function overviewHtml(){
+  const m=SCR[S.screen];
+  const ch=id=>`<span class="${!lit(id)?"off":m.c.includes(id)?"ctr":m.p.includes(id)?"par":""}">${KA[id].short}</span>`;
+  return `<div class="row"><b>順番に進める3つ</b>${["sa","ra","se"].map(ch).join("<i>→</i>")}</div><div class="row"><b>どの段階でも行う3つ（順番はない）</b>${["ba","el","rl"].map(ch).join("")}</div>`;
 }
+function renderChrome(){
+  const n=SCR[S.screen].st, b=BLOCK[S.screen];
+  $("#stageLabel").textContent = n ? `Stage ${n} / 5${b?`　ワーク ${b} / 6（目安 ${BLOCK_MIN[b]}分）`:""}` : "はじめに";
+  $("#prog").style.width = (n/5*100)+"%";
+  $("#bamap").innerHTML = overviewHtml();
+  const ic=infoCards(), rc=reqCards();
+  $("#drawer").classList.toggle("hide", ic.length===0&&rc.length===0);
+  $("#cntI").textContent = "情報"+ic.length;
+  $("#cntR").textContent = "要求"+rc.length;
+  $("#cardList").innerHTML = ic.map(infoCardHtml).join("")+rc.join("")+`<p class="note">※ カードの数値は、実際の事例を参考にした想定値です。</p>`;
+}
+const stHead = ()=>{ const n=SCR[S.screen].st; return `<h2>Stage ${n}　${STAGE_TITLE[n]}</h2>`; };
 
 const R = {};
 R.intro = ()=>`
@@ -507,219 +957,393 @@ R.intro = ()=>`
   <p>あなたは、大学の学生課から相談を受けた新人のビジネスアナリスト（BA）です。</p>
   <div class="say"><div class="who">学生課の課長（依頼主）</div>学生アンケートで、食堂の満足度が学内施設の最下位でした。「昼休みに食べられない」という苦情も毎週届きます。予算は初年度${BUDGET}万円。他の大学みたいに、スマホで注文できるアプリでも入れればいいんでしょうか？</div>
   <p>BAの仕事は、すぐに何かを作ることではありません。<b>本当の問題は何か、誰が何を必要としているかを整理し、価値のある解決策を選ぶこと</b>です。</p>
-  <p>これから6つの場面で判断していきます。それぞれの場面は、BAの知識体系「BABOK」の6つの知識エリアに対応しています。選び方によって、手に入る情報も、最後の結末も変わります。</p>
-  <p class="muted">画面上部の「BACCM」は、BAが考えるべき6つのコア概念です。進むにつれて埋まっていきます。集めた情報は、画面下の「発見カード」にたまります。</p>
-  <div class="actions"><button class="btn" data-act="to:s1">はじめる</button></div>
-  ${COLLECT_URL?`<p class="note">※ 選んだ内容は、名前や学籍番号を含まない形で集計し、授業中に「全体でどう分かれたか」を見せるためだけに使います。成績には関係しません。</p>`:""}
+  <h3>これからの流れ</h3>
+  <p>ワークは6つに分かれています。1つ目は5分ほどで、各ワークが終わると、合図があるまで待ちます（目安はワークの上に表示されます）。</p>
+  <p>画面の上にある「BAの全体図」は、BABOKの6つの知識エリアです。今はすべて薄く表示されています。ワークを進めるたびに、そのワークで使う知識エリアが1つずつ濃くなります。6つは手順ではなく、<b>順番に進める3つ</b>と、<b>どの段階でも行う3つ</b>に分かれます。</p>
+  <ol>
+    <li>何を問題とするか、どうなればよいかを決める</li>
+    <li>誰から・どの方法で聞くかを計画し、結果を見て計画を直す</li>
+    <li>集めた声を要求に整理し、解決策の部品を組み合わせて提案を書く</li>
+    <li>想定外のできごとによる要求の変更に対応する</li>
+    <li>1年後の結果で、解決策の効果を評価する</li>
+  </ol>
+  <p class="muted">画面の下の「手持ちのカード」に、集めた情報（情報カード）と、整理した要求（要求カード）がたまっていきます。聞かなかったことは、カードになりません。どの選択にも得るものと失うものがあり、決まった正解はありません。</p>
+  ${gated("s1")?`<p class="muted">講師の合図があるまで、このままお待ちください。合図があると、下のボタンが押せるようになります。</p>`:""}
+  <div class="actions"><button class="btn" data-act="to:s1" ${gated("s1")?"disabled":""}>${gated("s1")?"合図を待っています…":"はじめる"}</button></div>
+  ${COLLECT_URL?`<p class="note">※ 選んだ内容は、名前や学籍番号を含まない形で集計し、授業中に「全体でどう分かれたか」を見せるためだけに使います。提案の文章は送信されません。成績には関係しません。</p>`:""}
   <p class="note">※ 大学・人物は架空です。数値や出来事は、日本の大学で実際に起きていることを参考にしています。</p>`;
 
 R.s1 = ()=>{
   const d=S.decided;
   let fb="";
   if(d){
-    const m={wait:["good","待ち時間を目的にしました。利用者の困りごとに近い捉え方です。"],
-      seat:["good","席の回転を目的にしました。行列の原因が「座れないこと」なら有効な捉え方です。"],
-      sales:["warn","生協の利用者と売上を目的にしました。運営者の関心には合いますが、学生の困りごとからは少しずれています。"],
-      data:["good","結論を急がず、まず現状を数字で確かめました。ピークの時間に来店が集中し、待ち時間が一番の問題だとわかりました。目的は「待ち時間を短くする」になります。"]}[S.s1];
-    fb=`<div class="fb ${m[0]}"><h3>結果</h3>${m[1]}<p class="muted">ポイント：課長は「アプリを入れる」という解決策を口にしましたが、BAはまず問題を定義します。現状と将来の姿の差（ギャップ）が、解くべき問題です。</p></div>${newCardsHtml()}`;
+    const F=FIRST[S.first];
+    const pm={
+      wait:"待ち時間を目的にしました。並ぶ学生や、レジ・返却口の現場の声が中心になります。行列の原因が「座れないこと」だった場合は、待ち時間を縮めても席は空きません。",
+      seat:"席の回転を目的にしました。席を探す学生や、建物を管理する施設課の声が中心になります。席が空いても、レジの列が短くなるとは限りません。",
+      sales:"利用者と売上を目的にしました。食堂を運営する生協の関心に合います。ただし売上は結果であり、混雑以外の理由でも変わります。学生の困りごとは、聞き取りで補う必要があります。"
+    }[S.prob];
+    const mm = S.measure===S.prob
+      ? "測る指標が問題の捉え方とそろっているので、あとで効果を比べられます。"
+      : "測る指標が問題の捉え方とずれています。目的に近づいたかどうかを、この指標では確かめにくくなります。";
+    fb=`<div class="fb"><h3>結果</h3>
+      <p><b>最初の一手：</b>${F.gain}。一方で、${F.lose}。</p><p class="muted">${F.fill}</p>
+      <p><b>問題の捉え方：</b>${pm}</p><p class="muted">${GOALS[S.prob].heavy}</p>
+      <p><b>指標：</b>${mm}${BLIND[S.measure]}。</p>
+      <p class="muted">ポイント：課長は「アプリを入れる」という解決策を口にしましたが、BAはまず問題を定義します。現状と目指す状態の差（ギャップ）が、解くべき問題です。どの問題の捉え方にも、重くなる声と、見えにくくなる声があります。</p></div>`;
   }
-  return `<h2>Stage 1　問題をどう捉える？</h2>${ka("s1")}
+  return `${stHead()}${kaBoxes()}
   <div class="say"><div class="who">学生課の課長</div>とにかく昼が大変なんです。行列もすごいし、席も空いていないし、最近は学食を使わない学生も増えたと生協さんが言っていて……。</div>
-  <p>この相談の「問題」をどう定義しますか？</p>
-  <div class="opts">${Object.entries(GOALS).map(([k,g])=>`<button class="opt ${S.s1===k?"sel":""}" data-act="s1:${k}" ${d?"disabled":""}><span class="t">${g.t}</span><span class="d">${g.d}</span></button>`).join("")}</div>
-  ${d?fb+nav("Stage 2へ","to:s2",true):nav("決定","decide:s1",!!S.s1)}`;
+  ${qh(1,"結論を出す前に、最初の一手として何をしますか？","時間は限られているので、1つだけ選びます。選ばなかった情報は、後の聞き取りで補えます。")}
+  <div class="opts">${Object.entries(FIRST).map(([k,f])=>opt("fm:"+k,S.first===k,f.t,"得られること："+f.gain+"<br>得られないこと："+f.lose,d)).join("")}</div>
+  ${S.first?infoCardHtml(cardOf(S.first)):""}
+  ${qh(2,"この相談の「問題」をどう定義しますか？")}
+  <div class="opts">${Object.entries(GOALS).map(([k,g])=>opt("pb:"+k,S.prob===k,g.t,g.d+"<br>"+g.heavy,d)).join("")}</div>
+  ${qh(3,"目指す状態に近づいたかを、何で測りますか？","現状と目指す状態の差を、数字で言えるようにします。")}
+  <div class="chips">${Object.entries(MEAS).map(([k,t])=>chip("ms:"+k,S.measure===k,t,d,"sq")).join("")}</div>
+  ${d?fb+nav("Stage 2へ","to:s2a",true):nav("決定","decide:s1",!!S.first&&!!S.prob&&!!S.measure)}`;
 };
 
-R.s2 = ()=>{
-  const d=S.decided;
-  let fb="";
-  if(d){
-    const miss = Object.keys(SH).filter(k=>!S.sh.includes(k)).map(k=>SH[k].t).join("、");
-    fb=`<div class="fb"><h3>結果</h3>3者から話を聞けることになりました。<p class="muted">選ばなかった人：${miss}。この人たちの声は、後で思わぬ形で届くかもしれません。</p><p class="muted">ポイント：関係者を洗い出したら、影響の大きさや関心の強さで優先順位をつけます。少数派の人や、お金・ルールを握る人を忘れると、後で困ります。</p></div>${newCardsHtml()}`;
-  }
-  return `<h2>Stage 2　誰に話を聞く？</h2>${ka("s2")}
-  <p>依頼主の学生課とは話ができています。期間は2週間。ほかに話を聞けるのは<b>3者まで</b>です。誰に聞きますか？</p>
-  <p class="muted">選択中：${S.sh.length} / 3</p>
-  <div class="opts">${Object.entries(SH).map(([k,g])=>`<button class="opt ${S.sh.includes(k)?"sel":""}" data-act="s2:${k}" ${d?"disabled":""}><span class="t">${g.t}</span><span class="d">${g.d}</span></button>`).join("")}</div>
-  ${d?fb+nav("Stage 3へ","to:s3",true):nav("決定","decide:s2",S.sh.length===3)}`;
-};
-
-R.s3 = ()=>{
-  const d=S.decided;
-  let fb="";
-  if(d){
-    const lines=S.tech.map(k=>`<li><b>${TECH[k].t}</b>：${TECH[k].ex}</li>`).join("");
-    fb=`<div class="fb"><h3>結果</h3><ul>${lines}</ul><p class="muted">ポイント：技法にはそれぞれ得意・不得意があります。聞くだけでは、本人も気づいていない行動はわかりません。数えるだけでは、理由はわかりません。組み合わせて弱みを補います。</p></div>${newCardsHtml()}`;
-  }
-  return `<h2>Stage 3　どうやって声を集める？</h2>${ka("s3")}
-  <p>選んだ3者（${S.sh.map(k=>SH[k].t).join("、")}）などから情報を集めます。使える方法は<b>2つまで</b>です。</p>
-  <p class="muted">選択中：${S.tech.length} / 2</p>
-  <div class="opts">${Object.entries(TECH).map(([k,g])=>`<button class="opt ${S.tech.includes(k)?"sel":""}" data-act="s3:${k}" ${d?"disabled":""}><span class="t">${g.t}</span><span class="pc"><span>◎</span><span>${g.good}</span><span>△</span><span>${g.weak}</span></span></button>`).join("")}</div>
-  ${d?fb+nav("Stage 4へ","to:s4a",true):nav("決定","decide:s3",S.tech.length===2)}`;
-};
-
-R.s4a = ()=>{
-  const d=S.decided;
-  const done = QUIZ.every((_,i)=>S.quiz[i]!==undefined);
-  const right = QUIZ.filter((q,i)=>S.quiz[i]===q.a).length;
-  const items = QUIZ.map((q,i)=>`<div class="quiz"><div class="q">${i+1}. 「${q.q}」</div><div class="chips">${QUIZ_TYPES.map((t,j)=>{
-      let cls = S.quiz[i]===j?"sel":"";
-      if(d){ if(j===q.a) cls="right"; else if(S.quiz[i]===j) cls="wrong"; }
-      return `<button class="chip ${cls}" data-act="q:${i}:${j}" ${d?"disabled":""}>${t}</button>`;}).join("")}</div>
-      ${d?`<div class="ans">${S.quiz[i]===q.a?"⭕":"❌"} ${q.why}</div>`:""}</div>`).join("");
-  return `<h2>Stage 4-1　要求を分類しよう</h2>${ka("s4")}
-  <p>集まった声を、要求の種類に分けます。それぞれどれにあたるでしょう？</p>${items}
-  ${d?`<div class="fb ${right>=4?"good":"warn"}"><h3>${right} / 5 問正解</h3><p class="muted">種類に分けると、「誰のための要求か」「システムに何をさせるか」「どのくらいの品質が必要か」が整理できます。</p></div>`+nav("次へ","to:s4b",true):nav("答え合わせ","decide:s4a",done)}`;
-};
-
-R.s4b = ()=>{
-  const d=S.decided;
-  let fb="";
-  if(d){
-    fb=`<div class="fb"><h3>Mustにした要求</h3><ul>${S.musts.map(r=>`<li>${REQS[r].t}</li>`).join("")}</ul><p class="muted">ポイント：MoSCoW法では、要求を Must（必須）／Should（できれば）／Could（余裕があれば）／Won't（今回はやらない）に分けます。Mustが多すぎると、何も削れなくなります。</p></div>`;
-  }
-  return `<h2>Stage 4-2　優先順位をつけよう</h2>
-  <p>次の要求のうち、絶対に外せない「Must」を<b>3つまで</b>選んでください。Mustにした要求は、後の判断に影響します。</p>
-  <p class="muted">選択中：${S.musts.length} / 3</p>
-  <div class="opts">${Object.entries(REQS).map(([k,r])=>`<button class="opt ${S.musts.includes(k)?"sel":""}" data-act="s4b:${k}" ${d?"disabled":""}><span class="t">${r.t}</span><span class="d">${r.k}</span></button>`).join("")}</div>
-  ${d?fb+nav("次へ","to:s4c",true):nav("決定","decide:s4b",S.musts.length>=1)}`;
-};
-
-function solAvailable(k){
-  if(k==="ret") return has("staff")||has("bottleneck");
-  if(k==="shift") return has("kyomu");
-  if(k==="seats") return !S.seatTried;
-  return true;
+function matrixHtml(max){
+  const done=S.iv, sel=S.plan;
+  const who=Object.keys(WHO).map(w=>{
+    const cells=MKEYS.map(m=>{
+      const k=w+"."+m, h=HEAR[w][m], isDone=done.includes(k), isSel=sel.includes(k);
+      if(!h.ok) return `<button class="mchip no" disabled>${METHOD[m].s} ✕</button>`;
+      const dis=isDone || (!isSel && sel.length>=max);
+      return `<button class="mchip ${isSel?"sel":""} ${isDone?"done":""}" data-act="pl:${k}" ${dis?"disabled":""}>${METHOD[m].s}<small>${isDone?"実施済み":esc(h.n+"・"+h.dep)}</small></button>`;
+    }).join("");
+    const whys=MKEYS.filter(m=>!HEAR[w][m].ok).map(m=>`${METHOD[m].s}：${HEAR[w][m].why}`).join("／");
+    return `<div class="who"><div class="nm">${WHO[w].t}</div><div class="ds">${WHO[w].d}</div><div class="ms">${cells}</div>${whys?`<div class="why">できない方法 — ${esc(whys)}</div>`:""}</div>`;
+  }).join("");
+  const bk=!done.includes("bench");
+  const bsel=sel.includes("bench");
+  const bench=`<div class="who"><div class="nm">相手を選ばない方法：事例調査（他大学）</div><div class="ds">1回として数えます</div><div class="ms"><button class="mchip ${bsel?"sel":""} ${!bk?"done":""}" data-act="pl:bench" ${(!bk||(!bsel&&sel.length>=max))?"disabled":""}>事例調査<small>${bk?esc(BENCH.n+"・"+BENCH.dep):"実施済み"}</small></button></div></div>`;
+  return `<p class="muted">ボタンの下に、聞ける人数と、得られる情報の深さが出ます。✕＝その相手にはできない方法。選択中：${sel.length} / ${max}</p>${who}${bench}`;
 }
-R.s4c = ()=>{
+
+R.s2a = ()=>{
   const d=S.decided;
-  const avail = Object.keys(SOL).filter(solAvailable);
-  const locked = ["ret","shift"].filter(k=>!solAvailable(k)).length;
   let fb="";
-  if(S.seatMsg){
-    fb+=`<div class="fb bad"><h3>施設課から待ったがかかりました</h3>「食堂の机と椅子は、消防法の通路幅の基準でもう限界です。これ以上は置けません」<p class="muted">一見簡単な解決策にも、見えていない制約があります。別の案を選び直してください。</p></div>`;
-  }
   if(d){
-    const e=evaluate();
-    fb+=`<div class="fb"><h3>「${SOL[S.sol].t}」に決めました</h3>
-      <p>初年度の見積もり：約${baseCost()}万円（予算${BUDGET}万円）</p>
-      ${e.mismatch?`<p class="muted">⚠ Mustにした要求と、選んだ解決策が合っていません。要求と解決策のつながりを確認しましょう。</p>`:""}
-      <p class="muted">ポイント：解決策は、要求を満たすかどうか、費用、リスクなどで比べて選びます。システムを作らない解決策も立派な選択肢です。</p></div>`;
+    const got=new Set(S.newCards.flatMap(k=>cardOf(k).f));
+    const want=PUR[S.purpose].f.some(f=>got.has(f));
+    fb=`<div class="fb ${want?"good":"warn"}"><h3>結果</h3><p>${want?`「${PUR[S.purpose].t}」を知りたいと計画し、それに合う情報が手に入りました。`:`「${PUR[S.purpose].t}」を知りたいと計画しましたが、今回の4回では、それに合う情報が手に入りませんでした。計画と実際の結果にずれが出たときは、次の回で計画を直します。`}</p><p class="muted">ポイント：同じ相手でも、方法によって人数と深さが変わります。1人にしか聞けない方法、そもそもできない方法もあります。聞かなかった相手のカードは入りません。</p></div>${newCardsHtml()}`;
   }
-  return `<h2>Stage 4-3　解決策を選ぼう</h2>
-  <p>ここまでの発見カードをふまえて、解決策を1つ選びます。</p>
-  <div class="opts">${avail.map(k=>`<button class="opt ${S.sol===k?"sel":""}" data-act="s4c:${k}" ${d?"disabled":""}><span class="t">${SOL[k].t}</span><span class="d">${SOL[k].d}　／　初年度 約${solCost(k)}万円</span></button>`).join("")}</div>
-  ${locked?`<p class="muted">🔒 情報が足りないため、見えていない解決策が ${locked} つあります。</p>`:`<p class="muted">🔓 集めた情報のおかげで、すべての解決策が選択肢に出ています。</p>`}
-  ${fb}
-  ${d?nav("Stage 5へ","to:s5",true):nav("決定","decide:s4c",!!S.sol)}`;
+  return `${stHead()}${kaBoxes()}
+  <p>聞き取りは合計6回できます。1回は「1人の相手に、1つの方法で聞くこと」です。まず4回を計画して実施し、結果を見てから残り2回を決めます。</p>
+  ${S.first?`<p class="muted">Stage 1の最初の一手で得た情報（${esc(FIRST[S.first].label)}）は、手持ちのカードに入っています。</p>`:""}
+  ${qh(1,"この4回で、一番知りたいことは何ですか？","目的を決めてから相手と方法を選ぶと、結果と照らして計画を見直せます。")}
+  <div class="opts">${Object.entries(PUR).map(([k,p])=>opt("pu:"+k,S.purpose===k,p.t,p.d,d)).join("")}</div>
+  ${qh(2,"誰に、どの方法で聞きますか？（4回）")}
+  ${d?"":matrixHtml(4)}
+  ${d?fb+nav("計画を見直す（次へ）","to:s2b",true):nav("この4回を実施する","decide:s2a",!!S.purpose&&S.plan.length===4)}`;
 };
 
-R.s5 = ()=>{
+function doneTableHtml(){
+  const rows=Object.keys(WHO).map(w=>`<tr><td>${WHO[w].t}</td>${MKEYS.map(m=>{const k=w+"."+m;return `<td>${S.iv.includes(k)?"●":(HEAR[w][m].ok?"":"✕")}</td>`;}).join("")}</tr>`).join("");
+  return `<table class="grid"><tr><th>相手＼方法</th>${MKEYS.map(m=>`<th>${METHOD[m].s}</th>`).join("")}</tr>${rows}<tr><td>事例調査（相手なし）</td><td colspan="5">${S.iv.includes("bench")?"●":""}</td></tr></table><p class="note">●＝実施済み　✕＝その相手にはできない方法　空欄＝まだ聞いていない</p>`;
+}
+R.s2b = ()=>{
+  const d=S.decided;
+  let fb="";
+  if(d){
+    const real=S.gapBefore.map(k=>GAPS[k].t), filled=S.gapBefore.filter(k=>!S.gapAfter.includes(k)).map(k=>GAPS[k].t), left=S.gapAfter.map(k=>GAPS[k].t);
+    const ok = S.gap==="none" ? S.gapBefore.length===0 : S.gapBefore.includes(S.gap);
+    fb=`<div class="fb ${ok?"good":"warn"}"><h3>計画の見直し</h3>
+      <p>${ok?"あなたが選んだ「足りない点」は、実際に足りていませんでした。":"あなたが選んだ点は、4回の結果を見ると、実は足りていました（または、ほかにもっと足りない点がありました）。"}</p>
+      <p>4回の時点で足りなかったこと：${real.length?"<ul>"+real.map(t=>`<li>${t}</li>`).join("")+"</ul>":"なし"}</p>
+      <p>追加の2回で埋まったこと：${filled.length?"<ul>"+filled.map(t=>`<li>${t}</li>`).join("")+"</ul>":"なし"}</p>
+      <p>${left.length?"まだ足りないこと：<ul>"+left.map(t=>`<li>${t}</li>`).join("")+"</ul>この足りない点は、提案の弱点になります。":"主な観点は一通りそろいました。"}</p>
+      <p class="muted">ポイント：計画は一度立てて終わりではありません。結果を見て足りない点を見つけ、計画を直します（モニタリング）。時間は限られているので、すべてを聞くことはできません。</p></div>${newCardsHtml()}`;
+  }
+  return `${stHead()}${kaBoxes()}
+  <p>最初の4回の結果が、手持ちのカードに入りました。計画を見直して、残り2回を決めます。</p>
+  ${doneTableHtml()}
+  ${qh(1,"今の情報で、一番足りないのは何ですか？","手持ちの情報カードを見て選びます。")}
+  <div class="opts">${Object.entries(GAPS).map(([k,g])=>opt("gp:"+k,S.gap===k,g.t,"",d)).join("")}${opt("gp:none",S.gap==="none","足りない点は特にない","",d)}</div>
+  ${qh(2,"残りの2回で、誰に、どの方法で聞きますか？")}
+  ${d?"":matrixHtml(2)}
+  ${d?fb+nav("Stage 3へ","to:s3a",true):nav("この2回を実施する","decide:s2b",!!S.gap&&S.plan.length===2)}`;
+};
+
+R.s3a = ()=>{
+  const d=S.decided;
+  const done=S.quizIds.every(id=>S.quiz[id]!==undefined);
+  const right=S.quizIds.filter(id=>isRight(id,S.quiz[id])).length;
+  const items=S.quizIds.map((id,i)=>{
+    const r=REQS[id], ok=isRight(id,S.quiz[id]);
+    return `<div class="quiz"><div class="q">${i+1}. 「${r.t}」</div><div class="src">${esc(reqSource(id))}</div><div class="chips">${RT.map((t,j)=>{
+      let cls=S.quiz[id]===j?"sel":"";
+      if(d){ if(isRight(id,j)) cls="right"; else if(S.quiz[id]===j) cls="wrong"; }
+      return `<button class="chip ${cls}" data-act="q:${id}:${j}" ${d?"disabled":""}>${t}</button>`;}).join("")}</div>
+      ${d?`<div class="ans">${ok?"⭕":"▲ 要整理"}　${RT_WHY[r.ty]}${ok&&S.quiz[id]!==r.ty?`この要求は「${RT[S.quiz[id]]}」としても扱えます。`:""}</div>`:""}</div>`;
+  }).join("");
+  return `${stHead()}${kaBoxes()}
+  <p>手持ちの情報カードから、要求カードを作ります。要求カードには、<b>出所</b>（元になった情報カード）と<b>種類</b>が付きます。聞いていない相手のことは、要求の候補に出てきません。</p>
+  <p class="muted">今の手持ちから作れる要求の候補は${reqList().length}件です。そのうち3件を、種類に分けてみましょう。</p>
+  ${qh("1〜3","次の要求は、どの種類にあたりますか？")}
+  ${items}
+  ${d?`<div class="fb ${right>=2?"good":"warn"}"><h3>${right} / 3 件を整理できました</h3><p>種類を整理できなかった要求には「要整理」の印がつきます。カードは使えますが、種類が未確定なので、Mustにしても、解決策の組み合わせが満たすかどうかを判定できません（判定は「？」になります）。</p><p class="muted">種類に分けると、「誰のための要求か」「システムに何をさせるか」「どのくらいの品質が必要か」が整理できます。</p></div>`+nav("次へ（優先順位をつける）","to:s3b",true):nav("答え合わせ","decide:s3a",done)}`;
+};
+
+R.s3b = ()=>{
+  const d=S.decided;
+  const cand=reqList();
+  const other=cand.filter(r=>!S.musts.includes(r));
+  let fb="";
+  if(d){
+    fb=`<div class="fb"><h3>優先順位をつけた要求カード</h3>${S.musts.map(r=>reqCardHtml(r,"Must")).join("")}${S.wont&&S.wont!=="none"?reqCardHtml(S.wont,"Won't（今回はやらない）"):""}
+    <p class="muted">ポイント：MoSCoW法では、要求を Must（必須）／Should（できれば）／Could（余裕があれば）／Won't（今回はやらない）に分けます。Mustが多すぎると、何も削れなくなります。「今回はやらない」と決めた要求も、後でできごととして戻ってくることがあります。選んだ基準：${CRIT[S.crit]}。</p></div>`;
+  }
+  return `${stHead()}${kaBoxes()}
+  <p>要求カードに、優先順位をつけます。手持ちの情報から作れる要求は${cand.length}件あります。</p>
+  ${qh(1,"絶対に外せない「Must」を、3つまで選んでください")}
+  <p class="muted">選択中：${S.musts.length} / 3</p>
+  <div class="opts">${cand.map(r=>opt("mu:"+r,S.musts.includes(r),REQS[r].t,typeLabel(r)+"｜"+reqSource(r),d)).join("")}</div>
+  ${qh(2,"「今回はやらない（Won't）」を、1つ選んでください","Must以外から選びます。")}
+  <div class="chips">${other.map(r=>chip("wn:"+r,S.wont===r,REQS[r].t,d,"sq")).join("")}${chip("wn:none",S.wont==="none","Won'tにするものはない",d,"sq")}</div>
+  ${qh(3,"優先順位は、何を基準に決めましたか？")}
+  <div class="chips">${Object.entries(CRIT).map(([k,t])=>chip("cr:"+k,S.crit===k,t,d,"sq")).join("")}</div>
+  ${d?fb+nav("次へ（解決策の部品を選ぶ）","to:s3c",true):nav("決定","decide:s3b",S.musts.length>=1&&!!S.wont&&!!S.crit)}`;
+};
+
+function partsPanel(){
+  const P=S.parts; if(!P.length) return "";
+  const cost=totalCost();
+  const cc=cost<=BUDGET*0.6?"ok":cost<=BUDGET?"mid":"ng";
+  const syn=synergies().map(s=>`<div class="syn ${s.pre?"warn":""}">${s.pre?"⚠ ":"✔ "}${s.t}</div>`).join("");
+  const fit=S.musts.length?`<table class="grid"><tr><th>Mustの要求カード</th><th>この組み合わせ</th></tr>${S.musts.map(r=>{const f=tidy(r)?"？":fitOf(r);return `<tr><td>${esc(REQS[r].t)}</td><td class="${fitCls(f)}">${f}</td></tr>`;}).join("")}</table><p class="note">✓満たす／△条件つき／✕満たさない／？種類が未確定（要整理）で判定できない。満たす数が多いほど良い、とは限りません。費用・リスク・現場の事情も合わせて判断します。</p>`:"";
+  return `<div class="fb"><h3>この組み合わせの見通し</h3><div class="cost"><span>初年度の費用の見積もり（予算${BUDGET}万円）</span><b class="${cc}">${cost}万円</b></div>${syn||`<div class="syn muted">相性や前提の指摘は、今のところありません。</div>`}${fit}</div>`;
+}
+const partDesc = k=>{
+  const p=PARTS[k];
+  const aim = p.ctr ? `問題への効きやすさ：待ち時間 ${p.aim[0]}／席 ${p.aim[1]}／売上 ${p.aim[2]}` : "補助専用（中心にはできません）";
+  return `${p.d}<br>初年度 ${p.cost?`約${p.cost}万円`:"ほぼ0円"}｜効き始め：${p.when}<br>${aim}<br>前提・注意：${p.pre}`;
+};
+R.s3c = ()=>{
+  const d=S.decided;
+  const avail=k=>!PARTS[k].need||PARTS[k].need.some(hasFact);
+  const locked=PART_ORDER.filter(k=>!avail(k)).length;
+  let fb="";
+  if(d){
+    const e=S.parts.filter(k=>k!==S.center).map(k=>PARTS[k].s);
+    fb+=`<div class="fb"><h3>提案の組み合わせ</h3><p>中心：<b>${PARTS[S.center].s}</b>${e.length?`<br>補助：${e.join("、")}`:""}</p><p class="muted">ポイント：結末は中心にした部品で決まります。補助の部品は、効果・満足度・費用・リスクを調整する役割です。どの部品にも前提があり、前提を聞いていないと、あとで想定外のできごとになります。心配な点として選んだのは「${WORRY[S.worry]}」でした。</p></div>`;
+  }
+  const centers=S.parts.map(k=>chip("ce:"+k,S.center===k,PARTS[k].s+(PARTS[k].ctr?"":"（補助専用）"),d||!PARTS[k].ctr,"sq")).join("");
+  return `${stHead()}${kaBoxes()}
+  <p>解決策は「部品」として並んでいます。<b>最大3つ</b>を組み合わせて提案にします。部品ごとに、費用・効き始め・前提が違います。</p>
+  ${qh(1,"部品を、3つまで選んでください")}
+  <p class="muted">選択中：${S.parts.length} / 3　${locked?`🔒 まだ情報が足りず、選べない部品が${locked}つあります。`:"🔓 集めた情報のおかげで、すべての部品が選べます。"}</p>
+  <div class="opts">${PART_ORDER.map(k=>{
+    const lk=!avail(k);
+    const dis=d||lk||(!S.parts.includes(k)&&S.parts.length>=3);
+    return opt("pa:"+k,S.parts.includes(k),PARTS[k].s+(lk?" 🔒":""),lk?"選べない理由："+PARTS[k].lockWhy:partDesc(k),dis);}).join("")}</div>
+  ${qh(2,"3つのうち、中心にする部品を1つ決めてください","補助専用の部品は、中心にできません。")}
+  ${S.parts.length?`<div class="chips">${centers}</div>`:`<p class="muted">部品を選ぶと、ここに出ます。</p>`}
+  ${S.parts.length&&!S.parts.some(k=>PARTS[k].ctr)?`<p class="muted">⚠ 選んだ部品は補助専用のものだけです。中心にできる部品を1つ以上入れてください。</p>`:""}
+  ${qh(3,"この組み合わせで、一番心配な点は何ですか？")}
+  <div class="chips">${Object.entries(WORRY).map(([k,t])=>chip("wo:"+k,S.worry===k,t,d,"sq")).join("")}</div>
+  ${partsPanel()}
+  ${fb}
+  ${d?nav("次へ（提案を書く）","to:s3d",true):nav("決定","decide:s3c",S.parts.length>=1&&!!S.center&&!!S.worry)}`;
+};
+
+R.s3d = ()=>{
+  const d=S.decided;
+  const ic=infoCards();
+  const wk=weaknesses();
+  const wkOpts={ask:["追加で聞く","今回は時間がないので、次の計画に入れておく（満足度が少し上がる）"],cond:["条件を付ける","「○○を確認できたら進める」という条件を提案に付ける（リスクが下がる）"],scope:["範囲を絞る","一部だけで始めて、結果を見て広げる（リスクが下がるが、効果も下がる）"],none:["対応しない","弱点はあるが、そのまま提案する（リスクが上がる）"]};
+  const wkBlock = wk.length
+    ? `<p>手持ちのカードと、選んだ部品から、次の弱点が見つかりました。</p><ul>${wk.map(w=>`<li>${w.t}</li>`).join("")}</ul><div class="opts">${Object.entries(wkOpts).map(([k,v])=>opt("wk:"+k,S.wk===k,v[0],v[1],d)).join("")}</div>`
+    : `<p>手持ちのカードと選んだ部品から、大きな弱点は見つかりませんでした。</p><div class="opts">${opt("wk:ok",S.wk==="ok","弱点は特にないので、このまま提案する","",d)}</div>`;
+  const cnt=[...S.pText].length;
+  return `${stHead()}${kaBoxes()}
+  <p>ここまでを、提案にまとめます。まず、手持ちのカードを相手×方法の表で見てみましょう。</p>
+  ${doneTableHtml()}
+  <p>提案：<b>${S.parts.map(k=>PARTS[k].s+(k===S.center?"（中心）":"")).join("＋")}</b></p>
+  ${qh(1,"この提案の根拠にする情報カードを、3枚まで選んでください")}
+  <p class="muted">選択中：${S.evid.length} / 3。カードの人数と深さも見て選びます。</p>
+  <div class="opts">${ic.map(k=>opt("ev1:"+k.key,S.evid.includes(k.key),esc(k.label),esc(k.text)+"　（"+(k.n||"")+"・"+(k.dep||"")+"）",d||(!S.evid.includes(k.key)&&S.evid.length>=3))).join("")}</div>
+  ${qh(2,"この提案の弱点に、どう対応しますか？")}
+  ${S.evid.length?wkBlock:`<p class="muted">根拠のカードを選ぶと、弱点が出ます。</p>`}
+  ${qh(3,"提案の要点を、100字程度で書いてください","上の選択を、自分の言葉でまとめます。この文章は端末の中だけに保存され、サーバーには送られません。")}
+  <textarea class="pt" id="ptext" maxlength="300" placeholder="例：○○を中心に、△△を組み合わせて提案する。根拠は……。弱点は……なので、……する。" ${d?"disabled":""}>${esc(S.pText)}</textarea>
+  <p class="note" id="pcount">${cnt}字</p>
+  ${d?`<div class="fb good"><h3>提案ができました</h3><p class="muted">提案の根拠は、情報カード → 要求カード → 解決策の部品、とたどれる形になっています。次のStageで、想定外のできごとが起きます。</p></div>`+nav("Stage 4へ","to:s4",true):nav("提案を確定する","decide:s3d",S.evid.length>=1&&!!S.wk)}`;
+};
+
+function affHtml(key){
+  const ids=EVENTS[key].aff;
+  if(key==="scope") return `<div class="fb"><h3>要求カードへの影響</h3><p class="muted">依頼された内容は、新しい要求カードとして追加されます。「目的につながるか」を、手持ちの要求カードの出所と照らして判断します。</p></div>`;
+  const lines=ids.map(id=>{
+    if(S.musts.includes(id)) return reqCardHtml(id,"Must");
+    if(reqAvail(id)) return `<div class="reqcard"><b>📋 要求カード｜Must以外</b>${esc(REQS[id].t)}<span class="meta">${esc(reqSource(id))}</span></div>`;
+    return `<div class="reqcard"><b>📋 該当する要求カードがありません</b>「${esc(REQS[id].t)}」<span class="meta">元になる情報カードがなく、要求として挙がっていませんでした（聞いていなかったため）。</span></div>`;
+  }).join("");
+  return `<h3>影響を受ける要求カード</h3>${lines}`;
+}
+R.s4 = ()=>{
   const key=S.events[S.ev], E=EVENTS[key], d=S.decided, ch=S.evChoice[key];
   const opts=E.opts();
   let fb="";
-  if(d){ const f=E.fb[ch]; fb=`<div class="fb ${f[0]}"><h3>結果</h3>${f[1]}</div>`; }
-  const last = S.ev===S.events.length-1;
+  if(d){ const raw=E.fb[ch]; const f=typeof raw==="function"?raw():raw; fb=`<div class="fb ${f[0]}"><h3>結果</h3>${f[1]}</div>`; }
+  const last=S.ev===S.events.length-1;
   const skipped=[];
   if(S.ev===0){
-    if(mustHas("r6") && baseCost()>BUDGET) skipped.push(`「${BUDGET}万円以内」をMustにしていたので、予算の問題は設計の段階で解決済みです。`);
-    if(isIT() && S.sh.includes("manager")) skipped.push("生協の店長と、運用費の分担を最初に話し合えていました。");
-    if(isIT() && (S.sh.includes("jyoshi")||mustHas("r5"))) skipped.push("プライバシーの扱いは、"+(S.sh.includes("jyoshi")?"情報センターに聞いていたので":"Mustにしていたので")+"最初から対策済みです。");
-    if(S.sol==="app" && (S.sh.includes("minority")||mustHas("r3"))) skipped.push("スマホを使えない人への配慮は、最初から設計に入っています。");
-    if(S.sol==="app" && (S.sh.includes("staff")||S.tech.includes("observe"))) skipped.push("厨房の調理能力を把握していたので、受取時刻の集中に備えられています。");
+    if(mustHas("g2") && totalCost()>BUDGET) skipped.push(`「${BUDGET}万円以内」をMustにしていたので、予算の問題は設計の段階で解決済みです。`);
+    if(itPart() && mustHas("r_coop")) skipped.push("「運用費を生協に負担させない」をMustにしていたので、費用の分担は最初から織り込めています。");
+    if(itPart() && mustAny(["g3","r_sec"])) skipped.push("プライバシーとセキュリティをMustにしていたので、扱う情報は最初から絞った設計になっています。");
+    if(hasPart("app") && mustAny(["r_noph","r_lang"])) skipped.push("スマホがない人や日本語以外の人への配慮をMustにしていたので、最初から設計に入っています。");
+    if(hasPart("app") && (hasPart("ret")||hasPart("menu")||mustHas("r_kit"))) skipped.push("厨房と受取口の負担に備える部品や要求が入っているので、受取時刻の集中に備えられています。");
+    if(hasPart("seats") && hasFact("facility")) skipped.push("施設課から通路幅の基準を聞いていたので、席の増設は基準に収まる範囲に絞っています。");
   }
-  return `<h2>Stage 5　想定外のできごと（${S.ev+1} / ${S.events.length}）</h2>${S.ev===0?ka("s5"):""}
-  ${skipped.length?`<div class="fb good"><h3>前半の判断が効いています</h3><ul>${skipped.map(s=>`<li>${s}</li>`).join("")}</ul></div>`:""}
+  const basis = o => o.basis===undefined ? "" : `<br><small>この判断に関係する手持ちのカード：${o.basis?esc(o.basis):"なし"}</small>`;
+  return `${stHead()}${S.ev===0?kaBoxes():""}
+  ${S.ev===0?`<p class="muted">ワーク4で行った優先順位づけや、要求カードの出所を残すことも、要求ライフサイクル管理の作業です。ここでは、要求が変わるできごとへの対応を判断します。</p>`:""}
+  <h3>できごと（${S.ev+1} / ${S.events.length}）</h3>
+  ${skipped.length?`<div class="fb good"><h3>前半の判断が効いています</h3><ul>${skipped.map(z=>`<li>${z}</li>`).join("")}</ul></div>`:""}
   <div class="say"><div class="who">${E.who}</div><b>${E.title}</b></div>
   <p>${E.text()}</p>
-  <div class="opts">${opts.map(o=>`<button class="opt ${ch===o.id?"sel":""}" data-act="ev:${o.id}" ${d?"disabled":""}><span class="t">${o.ws?"🤝 ":""}${o.t}</span><span class="d">${o.d}</span></button>`).join("")}</div>
-  ${d?fb+nav(last?"結果を見る（Stage 6）":"次のできごとへ", last?"to:s6":"nextev", true):nav("決定","decide:s5",!!ch)}`;
+  ${affHtml(key)}
+  ${qh(S.ev+1,"どう対応しますか？","どの選択肢も、現実にありうる判断です。手持ちのカードに根拠があるかどうかで、通るかどうかが変わります。")}
+  <div class="opts">${opts.map(o=>opt("ev:"+o.id,ch===o.id,o.t,o.d+basis(o),d)).join("")}</div>
+  ${d?fb+(last?`<h3>提案の文を直しますか？（任意）</h3><p class="muted">対応を踏まえて、提案の要点を書き直せます。端末の中だけに保存されます。</p><textarea class="pt" id="ptext" maxlength="300">${esc(S.pText)}</textarea><p class="note" id="pcount">${[...S.pText].length}字</p>`:""):""}
+  ${d?nav(last?"結果を見る（Stage 5）":"次のできごとへ", last?"to:s5":"nextev", true):nav("決定","decide:s4",!!ch)}`;
 };
 
 function meter(label,val,good,suffix){
   const color = good ? (val>=60?"var(--good)":val>=35?"var(--warn)":"var(--bad)") : (val<=35?"var(--good)":val<=60?"var(--warn)":"var(--bad)");
   return `<div class="meter"><div class="lab"><span>${label}</span><b>${suffix}</b></div><div class="bar"><i style="width:${val}%;background:${color}"></i></div></div>`;
 }
-R.s6 = ()=>{
+R.s5 = ()=>{
   const e=evaluate(), en=ENDINGS[e.ending];
   const costPct=Math.min(100,Math.round(e.cost/(BUDGET*2)*100));
-  const costColor = e.cost<=BUDGET*0.6?"var(--good)":e.cost<=BUDGET?"var(--warn)":"var(--bad)";
-  const evLog = S.events.map(k=>{const o=EVENTS[k].opts().find(x=>x.id===S.evChoice[k]);return `${EVENTS[k].title} → ${o?o.t:"-"}`;}).join("<br>");
-  const right = QUIZ.filter((q,i)=>S.quiz[i]===q.a).length;
-  const log = [
-    ["1","戦略分析",GOALS[S.s1].t],
-    ["2","計画とモニタリング",S.sh.map(k=>SH[k].t).join("、")],
-    ["3","引き出しとコラボレーション",S.tech.map(k=>TECH[k].t).join("、")],
-    ["4","要求分析とデザイン定義",`分類クイズ ${right}/5 ／ Must：${S.musts.map(r=>REQS[r].t).join("、")} ／ 解決策：${S.seatTried?"（席の増設は施設課が却下）→ ":""}${SOL[S.sol].t}`],
-    ["5","要求ライフサイクル管理",evLog],
-    ["6","ソリューション評価",en.t]
+  const costColor=e.cost<=BUDGET*0.6?"var(--good)":e.cost<=BUDGET?"var(--warn)":"var(--bad)";
+  const evLog=S.events.map(k=>{const o=EVENTS[k].opts().find(z=>z.id===S.evChoice[k]);return `${EVENTS[k].title} → ${o?o.t:"-"}`;}).join("<br>");
+  const right=S.quizIds.filter(id=>isRight(id,S.quiz[id])).length;
+  const ic=infoCards();
+  const F=FIRST[S.first];
+  const log=[
+    ["1","戦略分析（＋引き出し）",`最初の一手：${F.t}／問題：${GOALS[S.prob].t}／指標：${MEAS[S.measure]}`],
+    ["2","計画とモニタリング／引き出しとコラボレーション",`知りたいこと：${PUR[S.purpose].t}／聞き取り：${S.iv.map(k=>cardOf(k).label).join("、")}／計画の見直しで挙げた足りない点：${S.gap==="none"?"なし":GAPS[S.gap].t}`],
+    ["3","要求分析とデザイン定義（＋要求の管理）",`要求の分類 ${right}/3（要整理：${S.quizIds.filter(tidy).length}件）／Must：${S.musts.map(r=>REQS[r].t).join("、")}／Won't：${S.wont&&S.wont!=="none"?REQS[S.wont].t:"なし"}／部品：${S.parts.map(k=>PARTS[k].s+(k===S.center?"（中心）":"")).join("＋")}`],
+    ["4","要求ライフサイクル管理",evLog],
+    ["5","ソリューション評価",en.t]
+  ];
+  const kaRows=[
+    ["戦略分析","最初の一手・問題の捉え方・指標を決めた：3つの判断"],
+    ["計画とモニタリング","聞き取りの計画4回、見直し1回、追加2回"],
+    ["引き出しとコラボレーション",`情報カード ${ic.length}枚（最初の一手：${F.label}）`],
+    ["要求分析とデザイン定義",`要求の分類3問、部品の組み合わせ${S.parts.length}つ、提案の骨組み`],
+    ["要求ライフサイクル管理",`Must ${S.musts.length}件、変更への対応 ${S.events.length}件、要求カード ${reqCards().length}枚`],
+    ["ソリューション評価","この結果の確認（1回）"]
+  ];
+  // 選んだ内容のつじつま（○×ではなく、つながっているかを見る）
+  const gi={wait:0,seat:1,sales:2}[S.goal];
+  const AIM={"大":"大きい","中":"中くらい","小":"小さい","−":"ほとんど見込めない"};
+  const fits=S.musts.map(r=>tidy(r)?"？":fitOf(r));
+  const cnt=z=>fits.filter(f=>f===z).length;
+  const rel=REL[S.center]||[];
+  const askedW=rel.filter(hasWho), notW=rel.filter(a=>!hasWho(a));
+  const cons=[
+    ["問題 → 指標", S.measure===S.prob?"そろっている":`ずれている（問題：${GOALS[S.prob].short}／指標：${MEAS[S.measure]}）`],
+    ["問題 → 中心の部品", `「${PARTS[S.center].s}」が、「${GOALS[S.prob].short}」という問題に効きやすい度合いは、${AIM[PARTS[S.center].aim[gi]]}`],
+    ["Must → 部品", `満たす ${cnt("✓")}／条件つき ${cnt("△")}／満たさない ${cnt("✕")}／判定できない ${cnt("？")}`],
+    ["部品 → 聞き取り", rel.length?`中心の部品に関わる相手のうち、聞いた：${askedW.length?askedW.map(a=>WHO[a].t).join("、"):"なし"}／聞いていない：${notW.length?notW.map(a=>WHO[a].t).join("、"):"なし"}`:"関わる相手の指定はありません"],
+    ["提案 → 根拠", `根拠にしたカード ${S.evid.length}枚：${S.evid.map(k=>cardOf(k).label).join("、")}`]
   ];
   const h=hints();
-  return `<h2>Stage 6　1年後の結果</h2>${ka("s6")}
-  <div class="ending"><div class="tag">${en.tag}</div><h2>${en.t}</h2><p>${en.story}</p></div>
+  return `${stHead()}${kaBoxes()}
+  <div class="ending"><div class="tag">${en.tag}</div><h2>${en.t}</h2><p>${en.story}</p><p><b>うまくいった点：</b>${en.good}</p><p><b>残った課題：</b>${en.issue}</p></div>
   ${meter("効果（混雑の改善）",e.eff,true,e.eff+" / 100")}
   ${meter("関係者の満足度",e.sat,true,e.sat+" / 100")}
   <div class="meter"><div class="lab"><span>初年度の費用（予算${BUDGET}万円）</span><b>${e.cost}万円</b></div><div class="bar"><i style="width:${costPct}%;background:${costColor}"></i></div></div>
   ${meter("リスク（炎上・中止・反発）",e.risk,false,e.risk+" / 100")}
   ${e.notes.map(n=>`<p class="muted">※ ${n}</p>`).join("")}
-
+  <h3>選んだ内容のつながり</h3>
+  <table class="log"><tr><th>つながり</th><th>あなたの選択</th></tr>${cons.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table>
+  <p class="muted">正解・不正解の判定ではなく、問題 → 指標 → Must → 部品 → 根拠が互いにつながっているかを見ています。</p>
+  <h2>あなたの提案</h2>
+  <p>${S.pText?esc(S.pText).replace(/\n/g,"<br>"):`<span class="muted">（提案の要点は書いていません）</span>`}</p>
+  <p class="muted">根拠にしたカード：${S.evid.map(k=>cardOf(k).label).join("、")}</p>
   <h2>あなたのBA判断ログ</h2>
   <table class="log"><tr><th>Stage</th><th>知識エリア</th><th>あなたの選択</th></tr>
   ${log.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</table>
-
-  ${h.length?`<h3>別の選択をしていたら……</h3><ul>${h.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}
-
+  <h3>BAの全体図に当てはめると</h3>
+  <table class="log"><tr><th>知識エリア</th><th>この体験での使いどころ</th></tr>${kaRows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table>
+  <p class="muted">6つのエリアは、手順ではなくタスクの分類です。実務では、評価の結果を見て最初のStageに戻ったり、どの段階でも聞き取りや優先順位の見直しを行ったりします。</p>
+  <h3>手持ちのカード（出所つき）</h3>
+  ${ic.map(infoCardHtml).join("")}${reqCards().join("")}
+  ${S.extraEv.length?`<p class="muted">この提案では、ほかにも次のできごとが起きる可能性がありました：${S.extraEv.map(k=>EVENTS[k].title).join(" ／ ")}</p>`:""}
+  ${h.length?`<h3>別の選択をしていたら……</h3><ul>${h.map(z=>`<li>${z}</li>`).join("")}</ul>`:""}
   <h2>聞き方の図鑑</h2>
-  <p class="muted">BABOKには50の技法が載っています。今回はそのうち6つを使いました。</p>
-  ${Object.entries(TECH).map(([k,g])=>`<div class="tech ${S.tech.includes(k)?"used":""}"><span class="nm">${g.t}</span>${S.tech.includes(k)?`<span class="badge">使った</span>`:""}<div>◎ ${g.good}</div><div>△ ${g.weak}</div><div class="muted">今回なら：${g.ex}</div></div>`).join("")}
-
+  <p class="muted">BABOKには50の技法が載っています。今回はそのうち6つを使えました。</p>
+  ${Object.entries(TECH).map(([k,g])=>{const u=hasMethod(k);return `<div class="tech ${u?"used":""}"><span class="nm">${METHOD[k].t}</span>${u?`<span class="badge">使った</span>`:""}<div>◎ ${g.good}</div><div>△ ${g.weak}</div></div>`;}).join("")}
   <div class="actions"><button class="btn ghost" data-act="back">ひとつ前に戻る</button><button class="btn" data-act="restart">最初からもう一度</button></div>
   <p class="note">※ 大学・人物は架空です。数値や出来事は日本の大学の実例を参考にした設定です。参考：BABOK Guide v3（IIBA）</p>`;
 };
 
-function render(){ renderChrome(); $("#app").innerHTML = R[S.screen](); }
+function pauseNote(){
+  const e=BLOCK_END[S.screen], last=S.screen==="s4"&&S.ev===S.events.length-1;
+  if(!S.decided||(!e&&!last)) return "";
+  const n=e||6;
+  return `<div class="fb"><h3>ワーク ${n} / 6 が終わりました</h3><p>次は、合図があるまでお待ちください。</p>${COLLECT_URL ? `<p class="muted">${waiting()?"合図があると、下のボタンが押せるようになります。":"下のボタンで次へ進めます。"}</p>` : `<p class="muted">（試作では、そのまま次へ進めます。集計に接続した公開版では、講師の合図で次の問いが開きます。）</p>`}</div>`;
+}
+function render(){ renderChrome(); $("#app").innerHTML = R[S.screen]()+pauseNote(); syncGate(); }
 
 // ============ 操作 ============
 function toggle(arr,k,max){ const i=arr.indexOf(k); if(i>=0) arr.splice(i,1); else if(arr.length<max) arr.push(k); }
 function decide(scr){
-  if(scr==="s1"){ S.goal = S.s1==="data" ? "wait" : S.s1; if(S.s1==="data") addCard("data"); }
-  if(scr==="s2"){ S.sh.forEach(addCard); }
-  if(scr==="s3"){
-    const t=S.tech;
-    if(t.includes("interview")) S.sh.forEach(k=>addCard(k+"_deep"));
-    if(t.includes("survey")) addCard("survey");
-    if(t.includes("observe")) addCard("bottleneck");
-    if(t.includes("workshop")) addCard("workshop");
-    if(t.includes("prototype")) addCard("prototype");
-    if(t.includes("benchmark")) addCard("benchmark");
+  S.decided=true;
+  if(scr==="s1"){ S.goal=S.prob; report([{q:"fm",v:S.first},{q:"pb",v:S.prob},{q:"ms",v:S.measure}]); }
+  if(scr==="s2a"){ S.iv=S.iv.concat(S.plan); addNew(S.plan); report([{q:"pu",v:S.purpose},{q:"pl",v:S.plan.slice()}]); S.plan=[]; }
+  if(scr==="s2b"){
+    S.gapBefore=gapNow();
+    S.iv=S.iv.concat(S.plan); addNew(S.plan); S.gapAfter=gapNow();
+    report([{q:"gp",v:S.gap},{q:"ad",v:S.plan.slice()}]); S.plan=[];
   }
-  if(scr==="s4c" && S.sol==="seats"){ S.seatTried=true; S.seatMsg=true; S.sol=null; report([{q:"seats",v:1}]); return; }
-  S.seatMsg = false;
-  S.decided = true;
-  if(scr==="s1") report([{q:"s1",v:S.s1}]);
-  if(scr==="s2") report([{q:"s2",v:S.sh.slice()}]);
-  if(scr==="s3") report([{q:"s3",v:S.tech.slice()}]);
-  if(scr==="s4a") report(QUIZ.map((_,i)=>({q:"q"+(i+1),v:S.quiz[i]})));
-  if(scr==="s4b") report([{q:"s4b",v:S.musts.slice()}]);
-  if(scr==="s4c") report([{q:"s4c",v:S.sol}]);
-  if(scr==="s5") report([{q:"ev_"+S.events[S.ev],v:S.evChoice[S.events[S.ev]]}]);
+  if(scr==="s3a") report([{q:"qz",v:S.quizIds.map(id=>id+"="+S.quiz[id])}]);
+  if(scr==="s3b") report([{q:"mu",v:S.musts.slice()},{q:"wn",v:S.wont},{q:"cr",v:S.crit}]);
+  if(scr==="s3c") report([{q:"pa",v:S.parts.slice()},{q:"ce",v:S.center},{q:"wo",v:S.worry}]);
+  if(scr==="s3d") report([{q:"evd",v:S.evid.slice()},{q:"wk",v:S.wk}]);
+  if(scr==="s4"){
+    const key=S.events[S.ev], ch=S.evChoice[key], E=EVENTS[key], o=E.opts().find(z=>z.id===ch);
+    (E.aff.length?E.aff:["new"]).forEach(r=>{ if(r==="new"||S.musts.includes(r)) S.chg.push({req:r,st:o.st||"変更して承認",ev:E.title.replace(/[「」]/g,"")}); });
+    report([{q:"ev_"+key,v:ch}]);
+  }
+}
+function act(a){
+  const [k,x1,x2]=a.split(":");
+  if(k==="to"){ if(gated(x1)) return; go(x1); return; }
+  if(k==="back"){ back(); return; }
+  if(k==="restart"){ S=init(); history.length=0; entrySnap=JSON.stringify(S); render(); window.scrollTo(0,0); return; }
+  if(k==="nextev"){ history.push(entrySnap); S.ev++; S.decided=false; S.newCards=[]; entrySnap=JSON.stringify(S); render(); window.scrollTo(0,0); return; }
+  if(k==="decide"){ decide(x1); render(); return; }
+  if(k==="fm") S.first = x1;
+  if(k==="pb") S.prob=x1;
+  if(k==="ms") S.measure=x1;
+  if(k==="pu") S.purpose=x1;
+  if(k==="pl") toggle(S.plan,x1,S.screen==="s2a"?4:2);
+  if(k==="gp") S.gap=x1;
+  if(k==="q") S.quiz[x1]=+x2;
+  if(k==="mu") toggle(S.musts,x1,3);
+  if(k==="wn") S.wont=x1;
+  if(k==="cr") S.crit=x1;
+  if(k==="pa"){ toggle(S.parts,x1,3); if(S.center && !S.parts.includes(S.center)) S.center=null; }
+  if(k==="ce") S.center=x1;
+  if(k==="wo") S.worry=x1;
+  if(k==="ev1") toggle(S.evid,x1,3);
+  if(k==="wk") S.wk=x1;
+  if(k==="ev") S.evChoice[S.events[S.ev]]=x1;
+  const y0=window.scrollY; render(); window.scrollTo(0,y0);
 }
 document.addEventListener("click",ev=>{
   const b=ev.target.closest("[data-act]"); if(!b||b.disabled) return;
-  const [a,x,y]=b.dataset.act.split(":");
-  if(a==="to"){ go(x); return; }
-  if(a==="back"){ back(); return; }
-  if(a==="restart"){ S=init(); history.length=0; entrySnap=JSON.stringify(S); render(); window.scrollTo(0,0); return; }
-  if(a==="nextev"){ history.push(entrySnap); S.ev++; S.decided=false; S.newCards=[]; entrySnap=JSON.stringify(S); render(); window.scrollTo(0,0); return; }
-  if(a==="decide"){ decide(x); render(); return; }
-  if(a==="s1") S.s1=x;
-  if(a==="s2") toggle(S.sh,x,3);
-  if(a==="s3") toggle(S.tech,x,2);
-  if(a==="q") S.quiz[+x]=+y;
-  if(a==="s4b") toggle(S.musts,x,3);
-  if(a==="s4c") S.sol=x;
-  if(a==="ev") S.evChoice[S.events[S.ev]]=x;
-  const y0=window.scrollY; render(); window.scrollTo(0,y0);
+  act(b.dataset.act);
+});
+document.addEventListener("input",ev=>{
+  if(ev.target && ev.target.id==="ptext"){ S.pText=ev.target.value; const p=$("#pcount"); if(p) p.textContent=[...S.pText].length+"字"; }
 });
 $("#drawerToggle").addEventListener("click",()=>{
   const l=$("#cardList"); l.classList.toggle("hide");
